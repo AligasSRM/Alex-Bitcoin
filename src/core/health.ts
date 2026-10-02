@@ -15,15 +15,22 @@ export interface CoreHealthSnapshot {
   alerts: Alert[];
 }
 
-function validated<T>(read: () => Promise<T>, validate: (value: T) => void, options?: Partial<SafeCallOptions>) {
+function validated<T>(
+  read: () => Promise<T>,
+  validate: (value: T) => void,
+  options?: Partial<SafeCallOptions>,
+) {
   return safeCall(async () => {
     const value = await read();
     validate(value);
     return value;
-  });
+  }, options);
 }
 
-export async function collectCoreHealthSnapshot(\n  deps: CoreDependencies,\n  options: Partial<SafeCallOptions> = {},\n): Promise<CoreHealthSnapshot> {
+export async function collectCoreHealthSnapshot(
+  deps: CoreDependencies,
+  options: Partial<SafeCallOptions> = {},
+): Promise<CoreHealthSnapshot> {
   const [miner, pool, wallet] = await Promise.all([
     validated(() => deps.miner.getTelemetry(), validateMinerTelemetry, options),
     validated(() => deps.pool.getTelemetry(), validatePoolTelemetry, options),
@@ -33,11 +40,32 @@ export async function collectCoreHealthSnapshot(\n  deps: CoreDependencies,\n  o
   const alerts: Alert[] = [];
   const observedAt = new Date().toISOString();
 
-  if (!miner.ok) alerts.push(createAlert({ source: "miner", severity: "critical", code: miner.code === "TIMEOUT" ? "MINER_TIMEOUT" : "MINER_UNAVAILABLE", message: miner.code === "TIMEOUT" ? "Miner telemetry timed out" : "Miner telemetry is unavailable", observedAt }));
-  if (!pool.ok) alerts.push(createAlert({ source: "pool", severity: "critical", code: pool.code === "TIMEOUT" ? "POOL_TIMEOUT" : "POOL_UNAVAILABLE", message: pool.code === "TIMEOUT" ? "Pool telemetry timed out" : "Pool telemetry is unavailable", observedAt }));
-  if (!wallet.ok) alerts.push(createAlert({ source: "wallet", severity: "critical", code: wallet.code === "TIMEOUT" ? "WALLET_TIMEOUT" : "WALLET_UNAVAILABLE", message: wallet.code === "TIMEOUT" ? "Wallet status timed out" : "Wallet status is unavailable", observedAt }));
+  if (!miner.ok) alerts.push(createAlert({
+    source: "miner",
+    severity: "critical",
+    code: miner.code === "TIMEOUT" ? "MINER_TIMEOUT" : "MINER_UNAVAILABLE",
+    message: miner.code === "TIMEOUT" ? "Miner telemetry timed out" : "Miner telemetry is unavailable",
+    observedAt,
+  }));
+
+  if (!pool.ok) alerts.push(createAlert({
+    source: "pool",
+    severity: "critical",
+    code: pool.code === "TIMEOUT" ? "POOL_TIMEOUT" : "POOL_UNAVAILABLE",
+    message: pool.code === "TIMEOUT" ? "Pool telemetry timed out" : "Pool telemetry is unavailable",
+    observedAt,
+  }));
+
+  if (!wallet.ok) alerts.push(createAlert({
+    source: "wallet",
+    severity: "critical",
+    code: wallet.code === "TIMEOUT" ? "WALLET_TIMEOUT" : "WALLET_UNAVAILABLE",
+    message: wallet.code === "TIMEOUT" ? "Wallet status timed out" : "Wallet status is unavailable",
+    observedAt,
+  }));
 
   let profitability: CoreHealthSnapshot["profitability"] = null;
+
   if (miner.ok) {
     try {
       profitability = calculateDailyProfitability({
@@ -55,8 +83,21 @@ export async function collectCoreHealthSnapshot(\n  deps: CoreDependencies,\n  o
       }));
     }
   } else {
-    alerts.push(createAlert({ source: "profitability", severity: "warning", code: "PROFITABILITY_UNAVAILABLE", message: "Profitability cannot be calculated without verified miner telemetry", observedAt }));
+    alerts.push(createAlert({
+      source: "profitability",
+      severity: "warning",
+      code: "PROFITABILITY_UNAVAILABLE",
+      message: "Profitability cannot be calculated without verified miner telemetry",
+      observedAt,
+    }));
   }
 
-  return { collectedAt: observedAt, miner: miner.ok ? miner.value : null, pool: pool.ok ? pool.value : null, wallet: wallet.ok ? wallet.value : null, profitability, alerts };
+  return {
+    collectedAt: observedAt,
+    miner: miner.ok ? miner.value : null,
+    pool: pool.ok ? pool.value : null,
+    wallet: wallet.ok ? wallet.value : null,
+    profitability,
+    alerts,
+  };
 }
