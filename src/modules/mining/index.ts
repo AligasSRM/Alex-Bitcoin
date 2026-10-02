@@ -10,3 +10,4 @@ export * from "./sha256d-engine";
 export * from "./miner-worker-runtime";
 export * from "./block-assembly";
 export * from "./bitcoin-core-rpc";
+export * from "./core-mining-work-bridge";
