@@ -1,18 +1,13 @@
 import type { MiningWork } from "../mining/types";
 import { validateMiningShare, type ShareValidationResult } from "../mining/share";
 
-export type ShareSubmissionReason =
-  | "unknown_job"
-  | "duplicate_share"
-  | "invalid_nonce_hex"
-  | "invalid_ntime";
-
 export interface StratumShareSubmission {
   workerId: string;
   jobId: string;
   extranonce2: string;
   ntime: string;
   nonce: string;
+  shareTargetHex?: string;
 }
 
 export interface ShareSubmissionResult extends ShareValidationResult {
@@ -96,7 +91,8 @@ export class ShareSubmissionEngine {
     }
 
     this.seen.add(key);
-    const result = validateMiningShare(work, {
+    const validationWork = request.shareTargetHex === undefined ? work : { ...work, targetHex: request.shareTargetHex };
+    const result = validateMiningShare(validationWork, {
       jobId: request.jobId,
       workerId: request.workerId,
       nonce,
