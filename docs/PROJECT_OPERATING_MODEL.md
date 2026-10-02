@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 19.3 GREEN / CLOSED
-Next engineering section: 19.4
+Current locked stop point: Section 19.4 GREEN / CLOSED
+Next engineering section: 19.5
 
 ## 1. What this system is
 
@@ -95,6 +95,13 @@ The upstream binding manages:
 
 Reconnect must explicitly tear down the previous generation, retire active jobs, invalidate stale callbacks, and establish a new session generation before accepting new work.
 
+Section 19.4 adds a bounded reconnect retry policy:
+- explicit maximum attempts
+- bounded exponential backoff
+- injectable delay/sleep for deterministic verification
+- final failure is surfaced instead of silently continuing
+- retries always operate after the previous generation has been disconnected and invalidated.
+
 ## 8. Failure/reconnect model
 
 Pool/network failure must not cause the system to silently continue submitting stale work.
@@ -105,7 +112,8 @@ Connected
 → failure
 → disconnected
 → invalidate old session/jobs
-→ reconnect
+→ bounded reconnect attempts
+→ backoff between attempts
 → new connection generation
 → subscribe/authorize
 → receive new job
@@ -262,15 +270,16 @@ The planned dashboard model is informed by established mining-monitoring pattern
 
 ### Timing rule
 
-The dashboard work starts only after the core mining system has been completed and the relevant engineering sections are GREEN/CLOSED. The dashboard is therefore a later phase, not part of the current 19.4 work unless explicitly re-planned.
+The dashboard work starts only after the core mining system has been completed and the relevant engineering sections are GREEN/CLOSED. The dashboard is therefore a later phase, not part of the current 19.5 work unless explicitly re-planned.
 
 ## 13. Current locked position
 
 Section 19.1 — Stratum Session + Job Lifecycle Boundary: GREEN / CLOSED.
 Section 19.2 — Upstream Session Lifecycle: GREEN / CLOSED.
 Section 19.3 — Upstream Reconnect Boundary: GREEN / CLOSED.
+Section 19.4 — Fail-Closed Upstream Reconnect Retry Boundary: GREEN / CLOSED.
 
-Current stop point: after 19.3.
-Next planned work: Section 19.4.
+Current stop point: after 19.4.
+Next planned work: Section 19.5.
 
 This document is the canonical reference for the operating model, modification/verification method, and the deferred control-dashboard architecture. It does not replace the source code, tests, CI evidence, or individual section records.
