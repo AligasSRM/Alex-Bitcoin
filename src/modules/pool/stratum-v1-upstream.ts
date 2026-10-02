@@ -40,7 +40,7 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
     if (!options.host.trim()) throw new Error("host is required");
     if (!Number.isInteger(options.port) || options.port < 1 || options.port > 65535) throw new Error("invalid port");
     if (!options.workerName.trim()) throw new Error("workerName is required");
-    if (!Number.isInteger(options.extranonce2Size) || (options.extranonce2Size ?? 4) < 1 || (options.extranonce2Size ?? 4) > 16) throw new Error("invalid extranonce2Size");
+    if (!Number.isInteger(options.extranonce2Size ?? 4) || (options.extranonce2Size ?? 4) < 1 || (options.extranonce2Size ?? 4) > 16) throw new Error("invalid extranonce2Size");
     if (!Number.isFinite(options.timeoutMs ?? 10000) || (options.timeoutMs ?? 10000) <= 0) throw new Error("invalid timeoutMs");
     this.options = {
       ...options,
