@@ -24,6 +24,7 @@ export function createHealthPoller(
   }
 
   let stopped = false;
+  let running = false;
   let timer: ReturnType<typeof setInterval> | undefined;
 
   const poll = async (): Promise<CoreHealthSnapshot> => {
@@ -39,10 +40,14 @@ export function createHealthPoller(
       if (timer) return;
 
       const run = async () => {
+        if (running || stopped) return;
+        running = true;
         try {
           onSnapshot(await poll());
         } catch (error) {
           onError(error);
+        } finally {
+          running = false;
         }
       };
 
