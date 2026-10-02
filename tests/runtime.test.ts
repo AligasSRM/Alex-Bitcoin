@@ -14,10 +14,19 @@ const adapters = {
   wallet: { async getStatus() { throw new Error("not called"); } },
 };
 
-const runtime = createRuntime(config, adapters);
+const profitabilityInput = {
+  hashrateHps: 1,
+  powerWatts: 1,
+  btcPriceUsd: 100_000,
+  btcPerHash: 1e-12,
+  electricityUsdPerKwh: 0.1,
+};
+
+const runtime = createRuntime(config, adapters, profitabilityInput);
 if (runtime.config !== config) throw new Error("runtime config wiring failed");
 if (runtime.core.miner !== adapters.miner) throw new Error("miner wiring failed");
 if (runtime.core.pool !== adapters.pool) throw new Error("pool wiring failed");
 if (runtime.core.wallet !== adapters.wallet) throw new Error("wallet wiring failed");
+if (runtime.core.profitabilityInput !== profitabilityInput) throw new Error("profitability input wiring failed");
 
 console.log("runtime wiring tests passed");
