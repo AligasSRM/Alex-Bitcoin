@@ -21,6 +21,15 @@ if (!("error" in unauthorized) || unauthorized.error?.[0] !== 24) throw new Erro
 const authorized = await session.handleLine(JSON.stringify({ id: 3, method: "mining.authorize", params: ["rig.1", "x"] }));
 if (!("error" in authorized) || authorized.error !== null || authorized.result !== true) throw new Error("authorize failed");
 
+session.registerJob("job-1");
+if (!session.isJobActive("job-1") || session.getJobGeneration() !== 1) throw new Error("job lifecycle registration failed");
+
+const wrongWorker = await session.handleLine(JSON.stringify({
+  id: 6, method: "mining.submit",
+  params: ["rig.2", "job-1", "00000000", "65000000", "00000001"],
+}));
+if (!("error" in wrongWorker) || wrongWorker.error?.[0] !== 24) throw new Error("unauthorized worker identity was accepted");
+
 const accepted = await session.handleLine(JSON.stringify({
   id: 4,
   method: "mining.submit",
@@ -35,8 +44,19 @@ const rejected = await session.handleLine(JSON.stringify({
 }));
 if (!("error" in rejected) || rejected.error?.[0] !== 20) throw new Error("invalid extranonce2 was not rejected");
 
+session.retireJob("job-1");
+if (session.isJobActive("job-1")) throw new Error("retired job remains active");
+const stale = await session.handleLine(JSON.stringify({
+  id: 7, method: "mining.submit",
+  params: ["rig.1", "job-1", "00000000", "65000000", "00000001"],
+}));
+if (!("error" in stale) || stale.error?.[0] !== 21) throw new Error("stale job was accepted");
+
 const notify = session.notifyJob("job-1", "00".repeat(32), "aa", "bb", [], "20000000", "1d00ffff", "65000000");
 if (notify.method !== "mining.notify" || notify.params[0] !== "job-1") throw new Error("notify payload mismatch");
+
+if (!session.isJobActive("job-1")) throw new Error("notifyJob did not reactivate job");
+if (session.getJobGeneration() !== 3) throw new Error("job generation did not advance correctly");
 
 const difficulty = session.setDifficulty(1);
 if (difficulty.method !== "mining.set_difficulty" || difficulty.params[0] !== 1) throw new Error("difficulty notification mismatch");
