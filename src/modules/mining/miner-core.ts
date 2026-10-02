@@ -54,7 +54,14 @@ export class MinerCore {
     this.jobs.clear();
     this.branches.clear();
     this.registerWork(work);
-    this.audit({ jobId: work.jobId, workerId: "system", type: "completed", timestamp: new Date().toISOString(), reason: previous.length ? "rolled_over" : "started" });
+    this.activateJob(work.jobId);
+    this.audit({
+      jobId: work.jobId,
+      workerId: "system",
+      type: "completed",
+      timestamp: new Date().toISOString(),
+      reason: previous.length ? "rolled_over" : "started",
+    });
   }
 
   mine(jobId: string, workerId: string, options: MiningSearchOptions = {}): MiningSearchResult {
