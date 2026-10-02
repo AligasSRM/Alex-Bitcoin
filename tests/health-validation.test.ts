@@ -61,4 +61,19 @@ if (!snapshot.alerts.some((alert) => alert.code === "MINER_UNAVAILABLE")) {
   throw new Error("invalid telemetry alert missing");
 }
 
+const timeoutDeps = {
+  ...deps,
+  pool: {
+    ...deps.pool,
+    async getTelemetry() {
+      await new Promise<void>((resolve) => setTimeout(resolve, 20));
+      return deps.pool.getTelemetry();
+    },
+  },
+};
+const timeoutSnapshot = await collectCoreHealthSnapshot(timeoutDeps);
+if (!timeoutSnapshot.pool || !timeoutSnapshot.alerts.some((alert) => alert.code === "POOL_TIMEOUT")) {
+  throw new Error("pool timeout classification failed");
+}
+
 console.log("external telemetry validation tests passed");
