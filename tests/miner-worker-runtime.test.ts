@@ -28,7 +28,8 @@ const result = await first;
 if (!result.found || result.hashesTried !== 1 || result.workerId !== "worker-a") {
   throw new Error("runtime worker did not execute one deterministic hash");
 }
-if (registry.get("worker-a")?.hashrateHps <= 0) throw new Error("worker hashrate was not recorded");
+const workerA = registry.get("worker-a");
+if (!workerA || workerA.hashrateHps <= 0) throw new Error("worker hashrate was not recorded");
 if (runtime.snapshot().runningWorkerIds.length !== 0) throw new Error("completed worker remained running");
 
 const stopped = runtime.start(work.jobId, "worker-a");
