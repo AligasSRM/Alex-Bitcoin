@@ -152,3 +152,26 @@ export class MiningUpstreamBinding {
     };
   }
 }
+
+export class UpstreamRecoverySupervisor {
+  private recovery?: Promise<void>;
+
+  constructor(
+    private readonly binding: MiningUpstreamBinding,
+    private readonly policy: UpstreamReconnectPolicy,
+  ) {}
+
+  recover(): Promise<void> {
+    if (this.recovery) return this.recovery;
+
+    this.recovery = this.binding.reconnectWithPolicy(this.policy).finally(() => {
+      this.recovery = undefined;
+    });
+
+    return this.recovery;
+  }
+
+  isRecovering(): boolean {
+    return this.recovery !== undefined;
+  }
+}
