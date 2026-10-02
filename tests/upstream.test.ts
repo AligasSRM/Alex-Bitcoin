@@ -1,7 +1,8 @@
 import { MiningProxy } from "../src/modules/pool/proxy";
 import { MiningUpstreamBinding, type UpstreamJobSource } from "../src/modules/pool/upstream";
+import type { MiningWork } from "../src/modules/mining/types";
 
-const work = {
+const work: MiningWork = {
   jobId: "upstream-job",
   headerPrefix76: new Uint8Array(76),
   nonceStart: 0,
@@ -10,7 +11,7 @@ const work = {
   createdAt: new Date().toISOString(),
 };
 
-let jobHandler: ((work: typeof work) => void) | undefined;
+let jobHandler: ((job: MiningWork) => void) | undefined;
 let connected = false;
 const submitted: string[] = [];
 
