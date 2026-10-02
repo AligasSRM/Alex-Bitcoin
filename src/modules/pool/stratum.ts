@@ -190,6 +190,7 @@ export class StratumSession {
   }
 
   setDifficulty(difficulty: number): StratumNotification {
+    if (!this.subscribed) throw new Error("subscribe first");
     if (!Number.isFinite(difficulty) || difficulty <= 0) {
       throw new Error("difficulty must be positive and finite");
     }
