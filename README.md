@@ -10,7 +10,7 @@ This project does not simulate mining or fabricate rewards.
 
 ## Current Stage
 
-STAGE 1 — ARCHITECTURE
+STAGE 3 — REAL EXTERNAL INTEGRATION: VERIFIED
 
 ## Principles
 
@@ -21,26 +21,39 @@ STAGE 1 — ARCHITECTURE
 - Test before lock
 - Binance is not a dependency
 
-## Planned Modules
+## Integrated External Adapters
 
-Miner Core, Pool Core, Wallet Core, Profitability Core, Security Core, Alerts, Dashboard
-
+- CGMiner-compatible ASIC telemetry adapter over TCP
+- HTTP pool telemetry adapter with timeout and payload validation
+- Bitcoin address balance adapter using a real public Bitcoin API
+- External adapter integration tests using local protocol-compatible services
+- No simulated production hashrate, rewards, or balances
 
 ## Current Verified Status
 
 - Stage 0 — Real Mining Feasibility: CLOSED
 - Stage 1 — Architecture: VERIFIED
 - Stage 2.1–2.23 — Core, modules, services, external contracts, lifecycle, health, retry, polling, readiness and runtime status: IMPLEMENTED
-- CI: GREEN
-- Latest verified workflow run: 37005273952
+- Stage 2.24 — Final Verification & Lock: GREEN
+- Stage 3.1 — Real Miner Adapter Contract: VERIFIED
+- Stage 3.2 — Real Pool Adapter: VERIFIED
+- Stage 3.3 — Real Wallet Adapter: VERIFIED
+- Stage 3.4 — External Telemetry Integration: VERIFIED
+- Stage 3.5 — Secrets/Security Boundary: VERIFIED
+- Stage 3.6 — Integration + Regression Tests: GREEN
+- Latest verified workflow run: 37005814600
+- Latest verified commit: d8612aaf5b33f95fd95c9d02eb068ca4bdb7677c
 - Typecheck: PASS
 - Core test suite: PASS
+- External adapter integration tests: PASS
 - Dependency audit in CI: 0 vulnerabilities reported
 
-### Production Activation Gate
+## Production Activation Gate
 
-This repository is the real mining control/monitoring foundation. It does **not** claim live Bitcoin mining until verified real ASIC, mining-pool, and wallet adapters are configured. No simulated hashrate, fabricated rewards, or fake BTC balances are used as production data.
+The software integration layer is verified and locked at Stage 3.
 
-Final sequence remains:
+Live Bitcoin mining is **not** claimed yet. Production activation still requires an actual ASIC miner, a real mining-pool account/endpoint, and a real Bitcoin wallet address to be configured through runtime configuration/secrets. Until those external dependencies are present and verified, the system remains fail-closed and does not fabricate mining activity or BTC rewards.
+
+Final sequence:
 
 DESIGN → BUILD → TEST → INTEGRATION TEST → REGRESSION TEST → SECURITY CHECK → FINAL VERIFY → LOCK
