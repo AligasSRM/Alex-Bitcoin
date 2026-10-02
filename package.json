@@ -5,7 +5,7 @@
   "description": "Production-oriented real Bitcoin mining control and monitoring system.",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "tsx tests/core.test.ts && tsx tests/miner.test.ts && tsx tests/pool.test.ts && tsx tests/wallet.test.ts && tsx tests/profitability.test.ts && tsx tests/alerts.test.ts && tsx tests/application.test.ts && tsx tests/services.test.ts && tsx tests/adapters.test.ts && tsx tests/runtime.test.ts && tsx tests/startup-gate.test.ts && tsx tests/lifecycle.test.ts && tsx tests/health.test.ts && tsx tests/health-validation.test.ts && tsx tests/retry.test.ts && tsx tests/health-poll.test.ts"
+    "test": "tsx tests/core.test.ts && tsx tests/miner.test.ts && tsx tests/pool.test.ts && tsx tests/wallet.test.ts && tsx tests/profitability.test.ts && tsx tests/alerts.test.ts && tsx tests/application.test.ts && tsx tests/services.test.ts && tsx tests/adapters.test.ts && tsx tests/runtime.test.ts && tsx tests/startup-gate.test.ts && tsx tests/lifecycle.test.ts && tsx tests/health.test.ts && tsx tests/health-validation.test.ts && tsx tests/retry.test.ts && tsx tests/health-poll.test.ts && tsx tests/readiness.test.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
