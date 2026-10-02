@@ -33,9 +33,9 @@ export async function collectCoreHealthSnapshot(deps: CoreDependencies): Promise
   const alerts: Alert[] = [];
   const observedAt = new Date().toISOString();
 
-  if (!miner.ok) alerts.push(createAlert({ source: "miner", severity: "critical", code: "MINER_UNAVAILABLE", message: "Miner telemetry is unavailable", observedAt }));
-  if (!pool.ok) alerts.push(createAlert({ source: "pool", severity: "critical", code: "POOL_UNAVAILABLE", message: "Pool telemetry is unavailable", observedAt }));
-  if (!wallet.ok) alerts.push(createAlert({ source: "wallet", severity: "critical", code: "WALLET_UNAVAILABLE", message: "Wallet status is unavailable", observedAt }));
+  if (!miner.ok) alerts.push(createAlert({ source: "miner", severity: "critical", code: miner.code === "TIMEOUT" ? "MINER_TIMEOUT" : "MINER_UNAVAILABLE", message: miner.code === "TIMEOUT" ? "Miner telemetry timed out" : "Miner telemetry is unavailable", observedAt }));
+  if (!pool.ok) alerts.push(createAlert({ source: "pool", severity: "critical", code: pool.code === "TIMEOUT" ? "POOL_TIMEOUT" : "POOL_UNAVAILABLE", message: pool.code === "TIMEOUT" ? "Pool telemetry timed out" : "Pool telemetry is unavailable", observedAt }));
+  if (!wallet.ok) alerts.push(createAlert({ source: "wallet", severity: "critical", code: wallet.code === "TIMEOUT" ? "WALLET_TIMEOUT" : "WALLET_UNAVAILABLE", message: wallet.code === "TIMEOUT" ? "Wallet status timed out" : "Wallet status is unavailable", observedAt }));
 
   let profitability: CoreHealthSnapshot["profitability"] = null;
   if (miner.ok) {
