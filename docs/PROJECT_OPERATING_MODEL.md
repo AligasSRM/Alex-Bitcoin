@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 19.6 GREEN / CLOSED
-Next engineering section: 19.7
+Current locked stop point: Section 19.7 GREEN / CLOSED
+Next engineering section: 19.8
 
 ## 1. What this system is
 
@@ -79,6 +79,14 @@ The Stratum layer manages:
 - session/job generation.
 
 The worker identity used for submit must match the authorized worker identity.
+
+Section 19.7 adds the Stratum difficulty state boundary:
+- difficulty notifications are validated before becoming runtime state
+- only finite, positive difficulty values are accepted
+- the active difficulty is persisted in the session
+- a valid update replaces the previous active difficulty
+- an invalid update fails closed and cannot overwrite the last valid difficulty
+- runtime consumers can read the current difficulty through the session boundary.
 
 ## 7. Upstream pool lifecycle
 
@@ -284,7 +292,7 @@ The planned dashboard model is informed by established mining-monitoring pattern
 
 ### Timing rule
 
-The dashboard work starts only after the core mining system has been completed and the relevant engineering sections are GREEN/CLOSED. The dashboard is therefore a later phase, not part of the current 19.7 work unless explicitly re-planned.
+The dashboard work starts only after the core mining system has been completed and the relevant engineering sections are GREEN/CLOSED. The dashboard is therefore a later phase, not part of the current 19.8 work unless explicitly re-planned.
 
 ## 13. Current locked position
 
@@ -294,8 +302,9 @@ Section 19.3 — Upstream Reconnect Boundary: GREEN / CLOSED.
 Section 19.4 — Fail-Closed Upstream Reconnect Retry Boundary: GREEN / CLOSED.
 Section 19.5 — Upstream Recovery Supervisor: GREEN / CLOSED.
 Section 19.6 — Degraded Upstream Recovery Boundary: GREEN / CLOSED.
+Section 19.7 — Stratum Difficulty State Boundary: GREEN / CLOSED.
 
-Current stop point: after 19.6.
-Next planned work: Section 19.7.
+Current stop point: after 19.7.
+Next planned work: Section 19.8.
 
 This document is the canonical reference for the operating model, modification/verification method, and the deferred control-dashboard architecture. It does not replace the source code, tests, CI evidence, or individual section records.
