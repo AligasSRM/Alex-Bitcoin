@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 19.9 GREEN / CLOSED
-Next engineering section: 20
+Current locked stop point: Section 20 GREEN / CLOSED
+Next engineering section: 21
 
 ## 1. What this system is
 
@@ -102,6 +102,15 @@ Section 19.9 adds the Stratum difficulty-to-target boundary:
 - sub-difficulty values are bounded to that maximum target
 - reverse conversion is available for verification and preserves the supported precision boundary
 - invalid difficulty and target inputs fail closed.
+
+
+Section 20 adds the Stratum runtime share-target binding:
+- the active Stratum difficulty is exposed as a deterministic 32-byte share target through the session boundary
+- share submission can receive the active runtime share target without mutating the stored mining job
+- the Stratum mining bridge passes the current session share target into share validation
+- when no Stratum difficulty has been established, existing job target validation remains authoritative
+- runtime target enforcement is covered by direct submission and bridge integration tests
+- invalid/stale/duplicate/session boundaries remain fail-closed through the existing validation chain.
 
 ## 7. Upstream pool lifecycle
 
@@ -320,8 +329,9 @@ Section 19.6 — Degraded Upstream Recovery Boundary: GREEN / CLOSED.
 Section 19.7 — Stratum Difficulty State Boundary: GREEN / CLOSED.
 Section 19.8 — Stratum Difficulty Lifecycle Boundary: GREEN / CLOSED.
 Section 19.9 — Stratum Difficulty Target Boundary: GREEN / CLOSED.
+Section 20 — Stratum Runtime Share-Target Binding: GREEN / CLOSED.
 
-Current stop point: after 19.9.
-Next planned work: Section 20.
+Current stop point: after Section 20.
+Next planned work: Section 21.
 
 This document is the canonical reference for the operating model, modification/verification method, and the deferred control-dashboard architecture. It does not replace the source code, tests, CI evidence, or individual section records.
