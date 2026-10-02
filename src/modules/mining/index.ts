@@ -12,3 +12,4 @@ export * from "./block-assembly";
 export * from "./bitcoin-core-rpc";
 export * from "./core-mining-work-bridge";
 export * from "./template-runtime-orchestrator";
+export * from "./solution-submission-boundary";
