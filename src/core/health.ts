@@ -4,7 +4,7 @@ import { createAlert, type Alert } from "../modules/alerts";
 import { validateMinerTelemetry } from "../modules/miner";
 import { validatePoolTelemetry } from "../modules/pool";
 import { validateWalletStatus } from "../modules/wallet";
-import { safeCall } from "../services/safe-call";
+import { safeCall, type SafeCallOptions } from "../services/safe-call";
 
 export interface CoreHealthSnapshot {
   collectedAt: string;
@@ -15,7 +15,7 @@ export interface CoreHealthSnapshot {
   alerts: Alert[];
 }
 
-function validated<T>(read: () => Promise<T>, validate: (value: T) => void) {
+function validated<T>(read: () => Promise<T>, validate: (value: T) => void, options?: Partial<SafeCallOptions>) {
   return safeCall(async () => {
     const value = await read();
     validate(value);
@@ -23,11 +23,11 @@ function validated<T>(read: () => Promise<T>, validate: (value: T) => void) {
   });
 }
 
-export async function collectCoreHealthSnapshot(deps: CoreDependencies): Promise<CoreHealthSnapshot> {
+export async function collectCoreHealthSnapshot(\n  deps: CoreDependencies,\n  options: Partial<SafeCallOptions> = {},\n): Promise<CoreHealthSnapshot> {
   const [miner, pool, wallet] = await Promise.all([
-    validated(() => deps.miner.getTelemetry(), validateMinerTelemetry),
-    validated(() => deps.pool.getTelemetry(), validatePoolTelemetry),
-    validated(() => deps.wallet.getStatus(), validateWalletStatus),
+    validated(() => deps.miner.getTelemetry(), validateMinerTelemetry, options),
+    validated(() => deps.pool.getTelemetry(), validatePoolTelemetry, options),
+    validated(() => deps.wallet.getStatus(), validateWalletStatus, options),
   ]);
 
   const alerts: Alert[] = [];
