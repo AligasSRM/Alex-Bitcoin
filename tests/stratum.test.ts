@@ -59,7 +59,26 @@ if (!session.isJobActive("job-1")) throw new Error("notifyJob did not reactivate
 if (session.getJobGeneration() !== 3) throw new Error("job generation did not advance correctly");
 
 const difficulty = session.setDifficulty(1);
-if (difficulty.method !== "mining.set_difficulty" || difficulty.params[0] !== 1) throw new Error("difficulty notification mismatch");
+if (difficulty.method !== "mining.set_difficulty" || difficulty.params[0] !== 1 || session.getDifficulty() !== 1) {
+  throw new Error("difficulty notification/state mismatch");
+}
+
+const updatedDifficulty = session.setDifficulty(32.5);
+if (updatedDifficulty.params[0] !== 32.5 || session.getDifficulty() !== 32.5) {
+  throw new Error("difficulty update did not replace the active value");
+}
+
+for (const invalidDifficulty of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+  let rejectedDifficulty = false;
+  try {
+    session.setDifficulty(invalidDifficulty);
+  } catch {
+    rejectedDifficulty = true;
+  }
+  if (!rejectedDifficulty || session.getDifficulty() !== 32.5) {
+    throw new Error("invalid difficulty changed or was not rejected");
+  }
+}
 
 const invalidJson = parseStratumRequest("{");
 if (!("error" in invalidJson) || invalidJson.error?.[0] !== -32700) throw new Error("invalid JSON was not rejected");
