@@ -9,7 +9,7 @@ const work = {
   headerPrefix76: prefix,
   nonceStart: genesisNonce,
   nonceEnd: genesisNonce,
-  targetHex: "0000000000000000000000000000000000000000000000000000000000000000",
+  targetHex: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
   createdAt: new Date().toISOString(),
 };
 
@@ -22,7 +22,7 @@ if (result.workerId !== "worker-a" || result.hashrateHps <= 0) throw new Error("
 
 let stop = false;
 const stopped = engine.scan(
-  { ...work, jobId: "stage4a2-stop", nonceStart: 0, nonceEnd: 1000 },
+  { ...work, jobId: "stage4a2-stop", nonceStart: 0, nonceEnd: 1000, targetHex: "0000000000000000000000000000000000000000000000000000000000000000" },
   "worker-a",
   { stopSignal: () => stop, onHash: (count) => { if (count === 3) stop = true; } },
 );
