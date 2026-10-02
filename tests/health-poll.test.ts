@@ -1,0 +1,70 @@
+import { createHealthPoller } from "../src/services/health-poll";
+
+const deps = {
+  miner: {
+    async connect() {},
+    async disconnect() {},
+    async getTelemetry() {
+      return {
+        minerId: "TEST-MINER",
+        model: "TEST-MODEL",
+        connection: "connected" as const,
+        hashrateHps: 100,
+        temperatureC: 60,
+        powerWatts: 1000,
+        acceptedShares: 10,
+        rejectedShares: 0,
+        observedAt: new Date().toISOString(),
+      };
+    },
+  },
+  pool: {
+    async connect() {},
+    async disconnect() {},
+    async getTelemetry() {
+      return {
+        poolId: "TEST-POOL",
+        endpoint: "stratum+tcp://test.invalid:3333",
+        connection: "connected" as const,
+        reportedHashrateHps: 100,
+        acceptedShares: 10,
+        rejectedShares: 0,
+        observedAt: new Date().toISOString(),
+      };
+    },
+  },
+  wallet: {
+    async getStatus() {
+      return {
+        walletId: "TEST-WALLET",
+        network: "bitcoin-testnet" as const,
+        payoutAddress: "TEST_ADDRESS",
+        confirmedSats: 0,
+        pendingSats: 0,
+        observedAt: new Date().toISOString(),
+      };
+    },
+  },
+  profitabilityInput: {
+    hashrateHps: 1,
+    powerWatts: 1,
+    btcPriceUsd: 100_000,
+    btcPerHash: 1e-12,
+    electricityUsdPerKwh: 0.1,
+  },
+};
+
+const poller = createHealthPoller(deps, { intervalMs: 0, attempts: 1, delayMs: 0 });
+const snapshot = await poller.poll();
+if (!snapshot.miner || !snapshot.pool || !snapshot.wallet) throw new Error("health poll failed");
+
+poller.stop();
+let stopped = false;
+try {
+  await poller.poll();
+} catch {
+  stopped = true;
+}
+if (!stopped) throw new Error("stopped poller accepted polling");
+
+console.log("health polling tests passed");
