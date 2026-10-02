@@ -4,3 +4,5 @@ export * from "./validation";
 export * from "./search";
 export * from "./audit";
 export * from "./share";
+export * from "./miner-core";
+export * from "./bitcoin-core-boundary";
