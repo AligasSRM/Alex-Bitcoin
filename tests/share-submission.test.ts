@@ -1,4 +1,3 @@
-import { hashHeader, hashToDisplayHex } from "../src/modules/mining/sha256d";
 import { ShareSubmissionEngine } from "../src/modules/pool/share-submission";
 
 const engine = new ShareSubmissionEngine();
@@ -20,6 +19,18 @@ const accepted = engine.submit({
   nonce: "00000001",
 });
 if (!accepted.acceptedForPool || accepted.duplicate) throw new Error("valid pool share was not accepted");
+
+const targetRejected = engine.submit({
+  workerId: "rig-1",
+  jobId: "pool-job",
+  extranonce2: "00000002",
+  ntime: "65000000",
+  nonce: "00000002",
+  shareTargetHex: "0000000000000000000000000000000000000000000000000000000000000001",
+});
+if (targetRejected.acceptedForPool || targetRejected.reason !== "target_not_met") {
+  throw new Error("runtime share target was not enforced");
+}
 
 const duplicate = engine.submit({
   workerId: "rig-1",
