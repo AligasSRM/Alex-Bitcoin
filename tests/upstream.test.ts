@@ -72,7 +72,7 @@ const rejectedDisconnected = await binding.submitShare({
 if (rejectedDisconnected || submitted.length !== 1) throw new Error("share was forwarded while disconnected");
 
 const staleHandler = jobHandler;
-await binding.connect();
+await binding.reconnect();
 if (binding.snapshot().connectionGeneration !== 3) throw new Error("connection generation did not advance safely");
 const currentHandler = jobHandler;
 if (!currentHandler) throw new Error("new upstream job handler was not registered");
