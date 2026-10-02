@@ -1,5 +1,5 @@
 import { MiningProxy } from "../src/modules/pool/proxy";
-import { MiningUpstreamBinding, type UpstreamJobSource } from "../src/modules/pool/upstream";
+import { MiningUpstreamBinding, UpstreamRecoverySupervisor, type UpstreamJobSource } from "../src/modules/pool/upstream";
 import type { MiningWork } from "../src/modules/mining/types";
 
 const work: MiningWork = {
@@ -114,6 +114,25 @@ if (connectFailures !== 0 || retryDelays.length !== 2 || retryDelays[0] !== 10 |
 if (binding.snapshot().state !== "connected" || binding.snapshot().connectionGeneration !== 7) {
   throw new Error("upstream retry policy did not establish a new generation");
 }
+
+await binding.disconnect();
+if (binding.snapshot().state !== "disconnected") throw new Error("upstream did not remain safely disconnected");
+
+connectFailures = 1;
+const supervisor = new UpstreamRecoverySupervisor(binding, {
+  maxAttempts: 2,
+  initialDelayMs: 5,
+  maxDelayMs: 5,
+  sleep: async (delayMs) => { retryDelays.push(delayMs); },
+});
+const recoveryA = supervisor.recover();
+const recoveryB = supervisor.recover();
+if (recoveryA !== recoveryB || !supervisor.isRecovering()) throw new Error("recovery was not serialized");
+await recoveryA;
+if (connectFailures !== 0 || !binding.snapshot().state || binding.snapshot().connectionGeneration !== 10) {
+  throw new Error("recovery supervisor did not establish the expected generation");
+}
+if (supervisor.isRecovering()) throw new Error("recovery supervisor remained active after completion");
 
 await binding.disconnect();
 if (binding.snapshot().state !== "disconnected") throw new Error("upstream did not remain safely disconnected");
