@@ -331,7 +331,7 @@ Section 19.8 — Stratum Difficulty Lifecycle Boundary: GREEN / CLOSED.
 Section 19.9 — Stratum Difficulty Target Boundary: GREEN / CLOSED.
 Section 20 — Stratum Runtime Share-Target Binding: GREEN / CLOSED.
 
-Current stop point: after Section 20.
-Next planned work: Section 21.
+Current stop point: after Section 21.
+Next planned work: Section 22.
 
 This document is the canonical reference for the operating model, modification/verification method, and the deferred control-dashboard architecture. It does not replace the source code, tests, CI evidence, or individual section records.
