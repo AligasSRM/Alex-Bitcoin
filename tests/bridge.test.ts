@@ -31,15 +31,25 @@ const accepted = await bridge.handleLine(JSON.stringify({
 }));
 if (!("error" in accepted) || accepted.error !== null || accepted.result !== true) throw new Error("submit bridge failed");
 
-const duplicate = await bridge.handleLine(JSON.stringify({
+bridge.session.setDifficulty(9000);
+const targetRejected = await bridge.handleLine(JSON.stringify({
   id: 4,
+  method: "mining.submit",
+  params: ["rig-1", "job-1", "00000002", "65000000", "00000002"],
+}));
+if (!("error" in targetRejected) || targetRejected.error !== null || targetRejected.result !== false) {
+  throw new Error("Stratum difficulty target was not enforced by the bridge");
+}
+
+const duplicate = await bridge.handleLine(JSON.stringify({
+  id: 5,
   method: "mining.submit",
   params: ["rig-1", "job-1", "00000001", "65000000", "00000001"],
 }));
 if (!("error" in duplicate) || duplicate.error !== null || duplicate.result !== false) throw new Error("duplicate was accepted");
 
 const stats = bridge.getStats();
-if (stats.accepted !== 1 || stats.rejected !== 1 || stats.duplicates !== 1) throw new Error("share stats incorrect");
-if (audit.snapshot().length !== 2) throw new Error("audit events missing");
+if (stats.accepted !== 1 || stats.rejected !== 2 || stats.duplicates !== 1) throw new Error("share stats incorrect");
+if (audit.snapshot().length !== 3) throw new Error("audit events missing");
 
 console.log("stratum mining bridge tests passed");

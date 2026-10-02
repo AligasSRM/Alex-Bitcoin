@@ -31,6 +31,7 @@ export class StratumMiningBridge {
           extranonce2: request.extranonce2,
           ntime: request.ntime,
           nonce: request.nonce,
+          shareTargetHex: this.session.getShareTargetHex(),
         });
         this.record(request.workerName, result);
         return result.acceptedForPool;

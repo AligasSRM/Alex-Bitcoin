@@ -78,6 +78,9 @@ const updatedDifficulty = session.setDifficulty(32.5);
 if (updatedDifficulty.params[0] !== 32.5 || session.getDifficulty() !== 32.5) {
   throw new Error("difficulty update did not replace the active value");
 }
+if (session.getShareTargetHex() !== "0000000007e07627627627627627627627627627627627627627627627627627") {
+  throw new Error("difficulty target was not bound to the active Stratum difficulty");
+}
 
 for (const invalidDifficulty of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
   let rejectedDifficulty = false;
