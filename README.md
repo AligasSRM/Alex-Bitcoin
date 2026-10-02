@@ -10,7 +10,7 @@ This project does not simulate mining or fabricate rewards.
 
 ## Current Stage
 
-STAGE 3 — REAL EXTERNAL INTEGRATION: VERIFIED
+STAGE 4A.2 — REAL SHA-256d MINING ENGINE: VERIFIED
 
 ## Principles
 
@@ -41,18 +41,18 @@ STAGE 3 — REAL EXTERNAL INTEGRATION: VERIFIED
 - Stage 3.4 — External Telemetry Integration: VERIFIED
 - Stage 3.5 — Secrets/Security Boundary: VERIFIED
 - Stage 3.6 — Integration + Regression Tests: GREEN
-- Latest verified workflow run: 37005814600
-- Latest verified commit: d8612aaf5b33f95fd95c9d02eb068ca4bdb7677c
-- Typecheck: PASS
-- Core test suite: PASS
-- External adapter integration tests: PASS
-- Dependency audit in CI: 0 vulnerabilities reported
+- Stage 4A.1 — Miner Core Architecture: GREEN / CLOSED
+- Stage 4A.2 — Real SHA-256d Mining Engine: VERIFIED
+- SHA-256d double-hash execution: PASS
+- Bitcoin target comparison: PASS
+- Real nonce scanning: PASS
+- Worker stop-signal handling: PASS
+- Real measured hashrate telemetry: PASS
+- Invalid engine parameters fail closed: PASS
 
 ## Production Activation Gate
 
-The software integration layer is verified and locked at Stage 3.
-
-Live Bitcoin mining is **not** claimed yet. Production activation still requires an actual ASIC miner, a real mining-pool account/endpoint, and a real Bitcoin wallet address to be configured through runtime configuration/secrets. Until those external dependencies are present and verified, the system remains fail-closed and does not fabricate mining activity or BTC rewards.
+The software mining engine is verified through Stage 4A.2. Live Bitcoin mining is **not** claimed yet. Production activation still requires an actual ASIC miner, a real mining-pool account/endpoint, and a real Bitcoin wallet address to be configured through runtime configuration/secrets. Until those external dependencies are present and verified, the system remains fail-closed and does not fabricate mining activity or BTC rewards.
 
 Final sequence:
 
