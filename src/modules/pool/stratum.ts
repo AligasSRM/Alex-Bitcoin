@@ -78,6 +78,9 @@ export function parseStratumRequest(line: string): StratumRequest | StratumRespo
 export class StratumSession {
   private subscribed = false;
   private authorized = false;
+  private authorizedWorker?: string;
+  private readonly activeJobs = new Set<string>();
+  private jobGeneration = 0;
   private readonly extranonce1: string;
   private readonly extranonce2Size: number;
   private readonly options: StratumSessionOptions;
@@ -130,6 +133,7 @@ export class StratumSession {
 
     const accepted = this.options.authorize ? await this.options.authorize(params[0], params[1]) : false;
     this.authorized = accepted;
+    this.authorizedWorker = accepted ? params[0] : undefined;
     return okResponse(id, accepted);
   }
 
@@ -143,6 +147,8 @@ export class StratumSession {
     const [workerName, jobId, extranonce2, ntime, nonce] = params as string[];
 
     if (!workerName || !jobId) return errorResponse(id, 20, "invalid worker or job");
+    if (this.authorizedWorker !== workerName) return errorResponse(id, 24, "worker does not match authorized session");
+    if (!this.activeJobs.has(jobId)) return errorResponse(id, 21, "stale or unknown job");
     if (!isHex(extranonce2, this.extranonce2Size * 2)) return errorResponse(id, 20, "invalid extranonce2");
     if (!isHex(ntime, 8)) return errorResponse(id, 20, "invalid ntime");
     if (!isHex(nonce, 8)) return errorResponse(id, 20, "invalid nonce");
@@ -152,6 +158,34 @@ export class StratumSession {
       : false;
 
     return okResponse(id, accepted);
+  }
+
+  registerJob(jobId: string): void {
+    if (!jobId.trim()) throw new Error("jobId is required");
+    this.activeJobs.add(jobId);
+    this.jobGeneration += 1;
+  }
+
+  retireJob(jobId: string): void {
+    this.activeJobs.delete(jobId);
+    this.jobGeneration += 1;
+  }
+
+  retireAllJobs(): void {
+    if (this.activeJobs.size > 0) this.jobGeneration += 1;
+    this.activeJobs.clear();
+  }
+
+  getJobGeneration(): number {
+    return this.jobGeneration;
+  }
+
+  isJobActive(jobId: string): boolean {
+    return this.activeJobs.has(jobId);
+  }
+
+  snapshotActiveJobs(): string[] {
+    return [...this.activeJobs];
   }
 
   setDifficulty(difficulty: number): StratumNotification {
@@ -179,6 +213,9 @@ export class StratumSession {
     if (!/^[0-9a-fA-F]*$/.test(coinbase1) || !/^[0-9a-fA-F]*$/.test(coinbase2) || merkleBranches.some((branch) => !isHex(branch, 64))) {
       throw new Error("invalid mining.notify coinbase or merkle branch");
     }
+
+    if (cleanJobs) this.retireAllJobs();
+    this.registerJob(jobId);
 
     return {
       method: "mining.notify",
