@@ -20,7 +20,9 @@ Until real runtime contracts are connected, unavailable values are rendered as N
 
 ## Runtime integration boundary
 
-The browser adapter listens for `alexbitcoin:runtime` and renders only validated runtime fields. It does not create telemetry, infer mining state, or start/stop mining. A production host must inject the real runtime snapshot and dispatch the event. Until that exists, the dashboard remains `NOT CONNECTED` and shows `N/A`.
+The dashboard consumes a fail-closed runtime snapshot through `window.AlexBitcoinRuntime` and the `alexbitcoin:runtime` event. The operator view covers runtime state, hashrate, temperature, power, efficiency, shares, pool/Stratum/job/wallet, ASIC telemetry, network health, live events, and verified financial fields. Missing or unverified values remain `N/A` / `NOT CONNECTED`.
+
+The dashboard does not create telemetry, infer mining state, fabricate profitability, or start/stop mining by itself. Production activation still requires the real host/runtime to inject verified data.
 
 ## Future integration
 The dashboard will consume the existing runtime/status, pool, miner, wallet, alert, and production-activation boundaries. UI integration and real mining verification are separate from this structural build.
