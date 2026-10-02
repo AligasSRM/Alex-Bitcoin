@@ -7,6 +7,17 @@ const session = new StratumSession({
   submit: async (share) => share.jobId === "job-1" && share.nonce === "00000001",
 });
 
+const preSubscribeDifficulty = new StratumSession({ extranonce1: "05060708" });
+let rejectedBeforeSubscribe = false;
+try {
+  preSubscribeDifficulty.setDifficulty(1);
+} catch {
+  rejectedBeforeSubscribe = true;
+}
+if (!rejectedBeforeSubscribe || preSubscribeDifficulty.getDifficulty() !== undefined) {
+  throw new Error("difficulty was accepted before subscription");
+}
+
 const subscribed = await session.handleLine(JSON.stringify({ id: 1, method: "mining.subscribe", params: [] }));
 if (!("error" in subscribed) || subscribed.error !== null) throw new Error("subscribe failed");
 if (!session.isSubscribed()) throw new Error("session did not subscribe");
