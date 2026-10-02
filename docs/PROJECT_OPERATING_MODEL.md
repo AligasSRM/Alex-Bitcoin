@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 20 GREEN / CLOSED
-Next engineering section: 21
+Current locked stop point: Section 21 GREEN / CLOSED
+Next engineering section: 22
 
 ## 1. What this system is
 
