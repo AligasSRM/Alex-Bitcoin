@@ -58,6 +58,13 @@ const poller = createHealthPoller(deps, { intervalMs: 0, attempts: 1, delayMs: 0
 const snapshot = await poller.poll();
 if (!snapshot.miner || !snapshot.pool || !snapshot.wallet) throw new Error("health poll failed");
 
+let scheduledCalls = 0;
+const scheduledPoller = createHealthPoller(deps, { intervalMs: 10, attempts: 1, delayMs: 0 });
+scheduledPoller.start(() => { scheduledCalls += 1; });
+await new Promise<void>((resolve) => setTimeout(resolve, 25));
+scheduledPoller.stop();
+if (scheduledCalls < 1) throw new Error("scheduled polling did not execute");
+
 poller.stop();
 let stopped = false;
 try {
