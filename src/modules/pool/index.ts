@@ -5,3 +5,4 @@ export * from "./share-submission";
 export * from "./bridge";
 export * from "./proxy";
 export * from "./upstream";
+export * from "./workers";
