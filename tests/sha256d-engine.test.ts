@@ -1,5 +1,5 @@
 import { Sha256dMiningEngine } from "../src/modules/mining/sha256d-engine";
-import { hashHeader, hashMeetsTarget } from "../src/modules/mining";
+import { hashHeader, hashMeetsTarget, hashToDisplayHex } from "../src/modules/mining";
 
 const prefix = new Uint8Array(76);
 const target = "00000000ffff0000000000000000000000000000000000000000000000000000";
@@ -22,7 +22,7 @@ if (result.workerId !== "worker-a" || result.hashrateHps <= 0) throw new Error("
 
 let stop = false;
 const stopped = engine.scan(
-  { ...work, jobId: "stage4a2-stop", nonceStart: 0, nonceEnd: 1000 },
+  { ...work, jobId: "stage4a2-stop", nonceStart: 0, nonceEnd: 1000, targetHex: "0000000000000000000000000000000000000000000000000000000000000000" },
   "worker-a",
   { stopSignal: () => stop, onHash: (count) => { if (count === 3) stop = true; } },
 );
@@ -36,6 +36,9 @@ genesisHeaderPrefix.set(Uint8Array.from(Buffer.from(merkle, "hex")).reverse(), 3
 view.setUint32(68, 1231006505, true);
 view.setUint32(72, 0x1d00ffff, true);
 const hash = hashHeader(genesisHeaderPrefix, genesisNonce);
+const genesisHashHex = hashToDisplayHex(hash);
+const expectedGenesisHash = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f";
+if (genesisHashHex !== expectedGenesisHash) throw new Error(`genesis SHA-256d mismatch: ${genesisHashHex}`);
 if (!hashMeetsTarget(hash, target)) throw new Error("genesis proof-of-work target check failed");
 
 let invalidMaxRejected = false;
