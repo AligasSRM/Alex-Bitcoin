@@ -13,12 +13,21 @@ const work: MiningWork = {
 
 let jobHandler: ((job: MiningWork) => void) | undefined;
 let connected = false;
+let connectFailures = 0;
 let connectCalls = 0;
 let disconnectCalls = 0;
 const submitted: string[] = [];
+const retryDelays: number[] = [];
 
 const upstream: UpstreamJobSource = {
-  async connect() { connected = true; connectCalls += 1; },
+  async connect() {
+    connectCalls += 1;
+    if (connectFailures > 0) {
+      connectFailures -= 1;
+      throw new Error("simulated upstream connect failure");
+    }
+    connected = true;
+  },
   async disconnect() { connected = false; disconnectCalls += 1; },
   getState() { return connected ? "connected" : "disconnected"; },
   onJob(handler) { jobHandler = handler; return () => { jobHandler = undefined; }; },
@@ -91,5 +100,22 @@ await binding.disconnect();
 if (binding.snapshot().submittedShares !== 1 || binding.snapshot().acceptedShares !== 1 || binding.snapshot().rejectedShares !== 2) {
   throw new Error("upstream share counters incorrect");
 }
+
+connectFailures = 2;
+await binding.reconnectWithPolicy({
+  maxAttempts: 3,
+  initialDelayMs: 10,
+  maxDelayMs: 25,
+  sleep: async (delayMs) => { retryDelays.push(delayMs); },
+});
+if (connectFailures !== 0 || retryDelays.length !== 2 || retryDelays[0] !== 10 || retryDelays[1] !== 20) {
+  throw new Error("upstream reconnect backoff policy did not retry deterministically");
+}
+if (binding.snapshot().state !== "connected" || binding.snapshot().connectionGeneration !== 7) {
+  throw new Error("upstream retry policy did not establish a new generation");
+}
+
+await binding.disconnect();
+if (binding.snapshot().state !== "disconnected") throw new Error("upstream did not remain safely disconnected");
 
 console.log("upstream binding lifecycle tests passed");
