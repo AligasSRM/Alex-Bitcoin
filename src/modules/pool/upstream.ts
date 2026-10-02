@@ -17,6 +17,13 @@ export interface UpstreamJobSource {
   }): Promise<boolean>;
 }
 
+export interface UpstreamReconnectPolicy {
+  maxAttempts: number;
+  initialDelayMs: number;
+  maxDelayMs: number;
+  sleep?: (delayMs: number) => Promise<void>;
+}
+
 export interface UpstreamBindingSnapshot {
   state: UpstreamState;
   activeJobs: number;
@@ -64,6 +71,38 @@ export class MiningUpstreamBinding {
   async reconnect(): Promise<void> {
     await this.disconnect();
     await this.connect();
+  }
+
+  async reconnectWithPolicy(policy: UpstreamReconnectPolicy): Promise<void> {
+    if (!Number.isInteger(policy.maxAttempts) || policy.maxAttempts < 1) {
+      throw new Error("maxAttempts must be a positive integer");
+    }
+    if (!Number.isFinite(policy.initialDelayMs) || policy.initialDelayMs < 0) {
+      throw new Error("initialDelayMs must be non-negative");
+    }
+    if (!Number.isFinite(policy.maxDelayMs) || policy.maxDelayMs < policy.initialDelayMs) {
+      throw new Error("maxDelayMs must be greater than or equal to initialDelayMs");
+    }
+
+    const sleep = policy.sleep ?? ((delayMs: number) => new Promise<void>((resolve) => setTimeout(resolve, delayMs)));
+    let delayMs = policy.initialDelayMs;
+    let lastError: unknown;
+
+    await this.disconnect();
+
+    for (let attempt = 1; attempt <= policy.maxAttempts; attempt += 1) {
+      try {
+        await this.connect();
+        return;
+      } catch (error) {
+        lastError = error;
+        if (attempt === policy.maxAttempts) break;
+        if (delayMs > 0) await sleep(delayMs);
+        delayMs = Math.min(Math.max(delayMs * 2, policy.initialDelayMs), policy.maxDelayMs);
+      }
+    }
+
+    throw lastError instanceof Error ? lastError : new Error("upstream reconnect attempts exhausted");
   }
 
   async disconnect(): Promise<void> {
