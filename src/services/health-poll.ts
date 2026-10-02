@@ -8,6 +8,7 @@ export interface HealthPollOptions extends RetryOptions {
 
 export interface HealthPoller {
   poll(): Promise<CoreHealthSnapshot>;
+  start(onSnapshot: (snapshot: CoreHealthSnapshot) => void, onError?: (error: unknown) => void): void;
   stop(): void;
 }
 
@@ -23,14 +24,40 @@ export function createHealthPoller(
   }
 
   let stopped = false;
+  let timer: ReturnType<typeof setInterval> | undefined;
+
+  const poll = async (): Promise<CoreHealthSnapshot> => {
+    if (stopped) throw new Error("Health poller is stopped");
+    return withRetry(() => collectCoreHealthSnapshot(deps), options);
+  };
 
   return {
-    async poll() {
+    poll,
+
+    start(onSnapshot, onError = () => undefined) {
       if (stopped) throw new Error("Health poller is stopped");
-      return withRetry(() => collectCoreHealthSnapshot(deps), options);
+      if (timer) return;
+
+      const run = async () => {
+        try {
+          onSnapshot(await poll());
+        } catch (error) {
+          onError(error);
+        }
+      };
+
+      void run();
+      if (intervalMs > 0) {
+        timer = setInterval(() => void run(), intervalMs);
+      }
     },
+
     stop() {
       stopped = true;
+      if (timer) {
+        clearInterval(timer);
+        timer = undefined;
+      }
     },
   };
 }
