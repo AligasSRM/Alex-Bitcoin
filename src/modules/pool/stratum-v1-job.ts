@@ -11,14 +11,11 @@ function hex(value: string, bytes: number): Uint8Array {
   return new Uint8Array(Buffer.from(value, "hex"));
 }
 
-function reverse4ByteWords(bytes: Uint8Array): Uint8Array {
+function validatePrevhash(bytes: Uint8Array): Uint8Array {
   if (bytes.length !== 32) throw new Error("prevhash must be 32 bytes");
-  const out = new Uint8Array(32);
-  for (let i = 0; i < 8; i += 1) {
-    const src = bytes.subarray((7 - i) * 4, (8 - i) * 4);
-    out.set(src, i * 4);
-  }
-  return out;
+  // Stratum V1 prevhash is already in the little-endian word layout
+  // required by the Bitcoin block header. Keep its bytes unchanged.
+  return bytes;
 }
 
 function reverseBytes(bytes: Uint8Array): Uint8Array {
@@ -88,9 +85,8 @@ export function stratumJobToMiningWork(job: StratumV1Job, options: StratumMining
   if (options.extranonce2.length > 32) throw new Error("extranonce2 is too large");
 
   const version = reverseBytes(hex(job.version, 4));
-  // Stratum V1 prevhash is transmitted as 8 little-endian 32-bit words.
-  // Reversing word order yields the 32-byte little-endian block-header field.
-  const prevhash = reverse4ByteWords(hex(job.prevHash, 32));
+  // Stratum V1 prevhash is transmitted in the header's little-endian word layout.
+  const prevhash = validatePrevhash(hex(job.prevHash, 32));
   const merkle = buildMerkleRoot(job, options.extranonce1, options.extranonce2);
   const ntime = reverseBytes(hex(job.ntime, 4));
   const nbits = reverseBytes(hex(job.nbits, 4));
