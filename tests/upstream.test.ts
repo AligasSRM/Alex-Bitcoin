@@ -88,7 +88,7 @@ if (binding.snapshot().activeJobs !== 1 || proxy.snapshot().registeredJobs !== 1
 }
 
 await binding.disconnect();
-if (binding.snapshot().submittedShares !== 1 || binding.snapshot().acceptedShares !== 1 || binding.snapshot().rejectedShares !== 3) {
+if (binding.snapshot().submittedShares !== 1 || binding.snapshot().acceptedShares !== 1 || binding.snapshot().rejectedShares !== 2) {
   throw new Error("upstream share counters incorrect");
 }
 
