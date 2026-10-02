@@ -84,10 +84,11 @@ export const EMPTY_RUNTIME: DashboardRuntimeSnapshot = {
     lastShareAt: null,
     bestShareDifficulty: null,
   },
-  wallet: {
-    configured: false,
-    address: null,
-  },
+  wallet: { configured: false, address: null },
+  asic: { boardCount: null, chipCount: null, frequencyMHz: null, hardwareErrors: null, fanRpm: null, status: null },
+  network: { internetConnected: null, latencyMs: null, reconnects: null, lastError: null },
+  events: [],
+  financial: { btcEarned: null, electricityCost: null, profitLoss: null, verified: false },
 };
 
 function nullableNumber(value: unknown): number | null {
@@ -112,6 +113,10 @@ export function normalizeRuntimeSnapshot(input: DashboardRuntimeInput | null | u
   const pool = objectOrEmpty(source.pool);
   const shares = objectOrEmpty(source.shares);
   const wallet = objectOrEmpty(source.wallet);
+  const asic = objectOrEmpty(source.asic);
+  const network = objectOrEmpty(source.network);
+  const financial = objectOrEmpty(source.financial);
+  const events = Array.isArray(source.events) ? source.events : [];
 
   return {
     observedAt: nullableString(source.observedAt) ?? "",
@@ -143,10 +148,11 @@ export function normalizeRuntimeSnapshot(input: DashboardRuntimeInput | null | u
       lastShareAt: nullableString(shares.lastShareAt),
       bestShareDifficulty: nullableNumber(shares.bestShareDifficulty),
     },
-    wallet: {
-      configured: Boolean(wallet.configured),
-      address: nullableString(wallet.address),
-    },
+    wallet: { configured: Boolean(wallet.configured), address: nullableString(wallet.address) },
+    asic: { boardCount: nullableNumber(asic.boardCount), chipCount: nullableNumber(asic.chipCount), frequencyMHz: nullableNumber(asic.frequencyMHz), hardwareErrors: nullableNumber(asic.hardwareErrors), fanRpm: nullableNumber(asic.fanRpm), status: nullableString(asic.status) },
+    network: { internetConnected: nullableBoolean(network.internetConnected), latencyMs: nullableNumber(network.latencyMs), reconnects: nullableNumber(network.reconnects), lastError: nullableString(network.lastError) },
+    events: events.slice(0, 100).flatMap((event) => { const e = objectOrEmpty(event); const at = nullableString(e.at); const severity = e.severity === "warning" || e.severity === "error" || e.severity === "info" ? e.severity : null; const source = nullableString(e.source); const message = nullableString(e.message); return at && severity && source && message ? [{ at, severity, source, message }] : []; }),
+    financial: { btcEarned: nullableNumber(financial.btcEarned), electricityCost: nullableNumber(financial.electricityCost), profitLoss: nullableNumber(financial.profitLoss), verified: Boolean(financial.verified) },
   };
 }
 
