@@ -1,0 +1,15 @@
+{
+  "name": "alex-bitcoin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production-oriented real Bitcoin mining control and monitoring system.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx tests/core.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
