@@ -4,3 +4,4 @@ export * from "./runtime";
 export * from "./startup-gate";
 export * from "./lifecycle";
 export * from "./retry";
+export * from "./health-poll";
