@@ -168,7 +168,103 @@ Section start
 
 Locked sections are not reopened unless there is a real technical failure, regression, or other concrete engineering reason.
 
-## 12. Current locked position
+## 12. Control Dashboard / Operator Panel — LOCKED FOR LATER PHASE
+
+The project will include a real operator control dashboard, but it is intentionally deferred until the mining system/runtime is fully built and the relevant engineering sections are GREEN/CLOSED.
+
+The dashboard is not a decorative UI and must not simulate mining state.
+
+### Purpose
+
+The dashboard is the operator's eyes and hands:
+- show the real runtime state
+- show live mining metrics
+- provide safe operator controls
+- expose the live event/log stream
+- make state transitions visible without requiring a terminal.
+
+### Planned live metrics
+
+At minimum, the dashboard should be able to display real runtime data such as:
+- current system state: READY / STARTING / MINING / STOPPING / STOPPED / ERROR
+- live hashrate and a time-series hashrate graph
+- temperature
+- power and efficiency when the hardware exposes them
+- pool connection state
+- Stratum/session state
+- current job
+- accepted, rejected, stale and duplicate shares where available
+- mining uptime
+- connection/reconnect information
+- live system events and errors.
+
+Metrics must come from the real runtime/telemetry boundary. The UI must never fabricate a value merely to make the screen look active.
+
+### Planned operator controls
+
+The primary controls are:
+- START MINING
+- STOP MINING
+
+Additional controls such as reconnect/restart may be added only when their runtime semantics and safety boundaries are explicitly implemented.
+
+START MINING must be a real control path, not a local UI toggle. The intended sequence is:
+
+START
+→ configuration validation
+→ security/secrets validation
+→ pool connection
+→ Stratum subscribe
+→ worker authorization
+→ receive a valid job
+→ start mining runtime
+→ ASIC hashing
+→ share validation
+→ share submission
+→ pool accepted/rejected result
+→ live telemetry.
+
+STOP MINING must stop the actual mining runtime and make the stopped state visible. The dashboard must not report MINING while the runtime is stopped or disconnected.
+
+### Visual model
+
+The dashboard should use a clear operator-first layout:
+- large live primary metric (especially hashrate)
+- compact status cards for temperature/power/efficiency
+- pool/Stratum/job status
+- share counters
+- live time-series graphs
+- uptime/elapsed-time counters that actually advance from runtime state
+- prominent START/STOP controls
+- live event log.
+
+Where useful, gauges/needle-style indicators can visualize instantaneous values, but graphs and numeric values remain the authoritative display for trends and exact readings.
+
+The design should work well on the user's Android phone as well as larger screens.
+
+### Safety boundary
+
+Architecture target:
+
+CONTROL DASHBOARD
+→ CONTROL/API BOUNDARY
+→ MINING RUNTIME
+→ STRATUM / MINER / TELEMETRY
+→ POOL / ASIC / LOGS
+
+The dashboard must not bypass security, worker/session lifecycle, job lifecycle, or fail-closed runtime rules.
+
+A disconnected/error state must be visible. No fake GREEN status is allowed.
+
+### Reference research
+
+The planned dashboard model is informed by established mining-monitoring patterns: Braiins Manager documents dashboards with hashrate, power, temperature, uptime, worker status and time-series views; Braiins also documents mining-pool monitoring and worker/share status. A local-first open-source mining dashboard, MinerWatch, demonstrates live miner cards, hashrate charts, temperature/power/fan data, pool accepted/rejected shares and phone/browser operation. These references are design input only; Alex Bitcoin remains its own architecture and implementation.
+
+### Timing rule
+
+The dashboard work starts only after the core mining system has been completed and the relevant engineering sections are GREEN/CLOSED. The dashboard is therefore a later phase, not part of the current 19.4 work unless explicitly re-planned.
+
+## 13. Current locked position
 
 Section 19.1 — Stratum Session + Job Lifecycle Boundary: GREEN / CLOSED.
 Section 19.2 — Upstream Session Lifecycle: GREEN / CLOSED.
@@ -177,4 +273,4 @@ Section 19.3 — Upstream Reconnect Boundary: GREEN / CLOSED.
 Current stop point: after 19.3.
 Next planned work: Section 19.4.
 
-This document is the canonical reference for the operating model and modification/verification method. It does not replace the source code, tests, CI evidence, or individual section records.
+This document is the canonical reference for the operating model, modification/verification method, and the deferred control-dashboard architecture. It does not replace the source code, tests, CI evidence, or individual section records.
