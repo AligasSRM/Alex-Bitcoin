@@ -171,6 +171,11 @@ export class UpstreamRecoverySupervisor {
     return this.recovery;
   }
 
+  recoverIfNeeded(): Promise<boolean> {
+    if (this.binding.snapshot().state === "connected") return Promise.resolve(false);
+    return this.recover().then(() => true);
+  }
+
   isRecovering(): boolean {
     return this.recovery !== undefined;
   }
