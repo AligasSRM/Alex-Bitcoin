@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { difficultyToTargetHex } from "./difficulty";
 
 export type StratumRpcId = number | string | null;
 
@@ -200,6 +201,10 @@ export class StratumSession {
 
   getDifficulty(): number | undefined {
     return this.currentDifficulty;
+  }
+
+  getShareTargetHex(): string | undefined {
+    return this.currentDifficulty === undefined ? undefined : difficultyToTargetHex(this.currentDifficulty);
   }
 
   notifyJob(
