@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 19.8 GREEN / CLOSED
-Next engineering section: 19.9
+Current locked stop point: Section 19.9 GREEN / CLOSED
+Next engineering section: 20
 
 ## 1. What this system is
 
@@ -94,6 +94,14 @@ Section 19.8 adds the Stratum difficulty lifecycle boundary:
 - the existing positive/finite validation remains enforced
 - valid post-subscription updates replace the active difficulty
 - tests verify that no difficulty state is created before subscription.
+
+Section 19.9 adds the Stratum difficulty-to-target boundary:
+- validated Stratum difficulty can be converted deterministically to a 32-byte share target
+- conversion uses integer arithmetic to avoid floating-point target construction
+- difficulty 1 maps to the Bitcoin difficulty-1 maximum target
+- sub-difficulty values are bounded to that maximum target
+- reverse conversion is available for verification and preserves the supported precision boundary
+- invalid difficulty and target inputs fail closed.
 
 ## 7. Upstream pool lifecycle
 
@@ -311,8 +319,9 @@ Section 19.5 — Upstream Recovery Supervisor: GREEN / CLOSED.
 Section 19.6 — Degraded Upstream Recovery Boundary: GREEN / CLOSED.
 Section 19.7 — Stratum Difficulty State Boundary: GREEN / CLOSED.
 Section 19.8 — Stratum Difficulty Lifecycle Boundary: GREEN / CLOSED.
+Section 19.9 — Stratum Difficulty Target Boundary: GREEN / CLOSED.
 
-Current stop point: after 19.8.
-Next planned work: Section 19.9.
+Current stop point: after 19.9.
+Next planned work: Section 20.
 
 This document is the canonical reference for the operating model, modification/verification method, and the deferred control-dashboard architecture. It does not replace the source code, tests, CI evidence, or individual section records.
