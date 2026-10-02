@@ -1,5 +1,6 @@
 import type { AppConfig } from "../core/config";
 import type { CoreDependencies } from "../core/application";
+import type { ProfitabilityInput } from "../modules/profitability";
 import type { ExternalAdapters } from "./adapters";
 
 export interface Runtime {
@@ -7,9 +8,13 @@ export interface Runtime {
   core: CoreDependencies;
 }
 
-export function createRuntime(config: AppConfig, adapters: ExternalAdapters): Runtime {
-  if (!config || !adapters) {
-    throw new Error("Runtime requires verified configuration and external adapters");
+export function createRuntime(
+  config: AppConfig,
+  adapters: ExternalAdapters,
+  profitabilityInput: ProfitabilityInput,
+): Runtime {
+  if (!config || !adapters || !profitabilityInput) {
+    throw new Error("Runtime requires verified configuration, adapters, and profitability input");
   }
 
   return {
@@ -18,13 +23,7 @@ export function createRuntime(config: AppConfig, adapters: ExternalAdapters): Ru
       miner: adapters.miner,
       pool: adapters.pool,
       wallet: adapters.wallet,
-      profitabilityInput: {
-        hashrateHps: 1,
-        powerWatts: 1,
-        btcPriceUsd: 1,
-        btcPerHash: 1,
-        electricityUsdPerKwh: 0,
-      },
+      profitabilityInput,
     },
   };
 }
