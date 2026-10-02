@@ -8,10 +8,10 @@ const result = calculateDailyProfitability({
   electricityUsdPerKwh: 0.10,
 });
 
-if (result.dailyBtc !== 8.64) throw new Error("daily BTC calculation failed");
-if (result.dailyRevenueUsd !== 864_000) throw new Error("revenue calculation failed");
-if (result.dailyElectricityCostUsd !== 2.4) throw new Error("electricity cost calculation failed");
-if (result.dailyProfitUsd !== 863_997.6) throw new Error("profit calculation failed");
+if (Math.abs(result.dailyBtc - 8.64) > 1e-12) throw new Error("daily BTC calculation failed");
+if (Math.abs(result.dailyRevenueUsd - 864_000) > 1e-9) throw new Error("revenue calculation failed");
+if (Math.abs(result.dailyElectricityCostUsd - 2.4) > 1e-12) throw new Error("electricity cost calculation failed");
+if (Math.abs(result.dailyProfitUsd - 863_997.6) > 1e-9) throw new Error("profit calculation failed");
 
 let rejected = false;
 try {
