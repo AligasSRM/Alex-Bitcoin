@@ -50,6 +50,30 @@ export class ShareSubmissionEngine {
       };
     }
 
+    if (!request.workerId.trim()) {
+      return {
+        accepted: false,
+        acceptedForPool: false,
+        duplicate: false,
+        jobId: work.jobId,
+        workerId: request.workerId,
+        nonce: 0,
+        reason: "invalid_work",
+      };
+    }
+
+    if (!isHex(request.extranonce2, request.extranonce2.length) || request.extranonce2.length === 0 || request.extranonce2.length % 2 !== 0) {
+      return {
+        accepted: false,
+        acceptedForPool: false,
+        duplicate: false,
+        jobId: work.jobId,
+        workerId: request.workerId,
+        nonce: 0,
+        reason: "invalid_work",
+      };
+    }
+
     if (!isHex(request.nonce, 8)) {
       return {
         accepted: false,
@@ -75,6 +99,17 @@ export class ShareSubmissionEngine {
     }
 
     const nonce = Number.parseInt(request.nonce, 16);
+    if (request.shareTargetHex !== undefined && !isHex(request.shareTargetHex, 64)) {
+      return {
+        accepted: false,
+        acceptedForPool: false,
+        duplicate: false,
+        jobId: work.jobId,
+        workerId: request.workerId,
+        nonce,
+        reason: "invalid_work",
+      };
+    }
     const key = [request.workerId, request.jobId, request.extranonce2.toLowerCase(), request.ntime.toLowerCase(), request.nonce.toLowerCase()].join(":");
 
     if (this.seen.has(key)) {

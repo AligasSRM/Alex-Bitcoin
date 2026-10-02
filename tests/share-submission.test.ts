@@ -11,6 +11,34 @@ const work = {
 };
 engine.registerJob(work);
 
+const invalidWorker = engine.submit({
+  workerId: "   ",
+  jobId: "pool-job",
+  extranonce2: "00000001",
+  ntime: "65000000",
+  nonce: "00000001",
+});
+if (invalidWorker.acceptedForPool || invalidWorker.reason !== "invalid_work") throw new Error("blank worker was accepted");
+
+const invalidExtranonce = engine.submit({
+  workerId: "rig-1",
+  jobId: "pool-job",
+  extranonce2: "xyz",
+  ntime: "65000000",
+  nonce: "00000001",
+});
+if (invalidExtranonce.acceptedForPool || invalidExtranonce.reason !== "invalid_work") throw new Error("invalid extranonce2 was accepted");
+
+const invalidTarget = engine.submit({
+  workerId: "rig-1",
+  jobId: "pool-job",
+  extranonce2: "00000003",
+  ntime: "65000000",
+  nonce: "00000003",
+  shareTargetHex: "xyz",
+});
+if (invalidTarget.acceptedForPool || invalidTarget.reason !== "invalid_work") throw new Error("invalid share target was accepted");
+
 const accepted = engine.submit({
   workerId: "rig-1",
   jobId: "pool-job",
