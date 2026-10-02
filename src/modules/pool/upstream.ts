@@ -61,6 +61,11 @@ export class MiningUpstreamBinding {
     });
   }
 
+  async reconnect(): Promise<void> {
+    await this.disconnect();
+    await this.connect();
+  }
+
   async disconnect(): Promise<void> {
     this.connected = false;
     this.connectionGeneration += 1;
