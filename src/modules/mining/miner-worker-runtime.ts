@@ -41,7 +41,11 @@ export class MinerWorkerRuntime {
       nonceEnd: branch.nonceEnd,
     };
 
-    const controller: WorkerController = { jobId, stop: false, promise: Promise.resolve(undefined as never) };
+    const controller: WorkerController = {
+      jobId,
+      stop: false,
+      promise: Promise.resolve(undefined as never),
+    };
     const promise = Promise.resolve().then(() =>
       this.engine.scan(work, workerId, {
         maxHashes: options.maxHashes,
@@ -52,23 +56,17 @@ export class MinerWorkerRuntime {
     this.controllers.set(workerId, controller);
     this.activeJobId = jobId;
 
-    void promise.finally(() => {
-      const current = this.controllers.get(workerId);
-      if (current === controller) this.controllers.delete(workerId);
-      const result = current === controller ? undefined : undefined;
-      if (result) this.core.getWorkerRegistry().setHashrate(workerId, result.hashrateHps);
-    });
-
     return promise.then((result) => {
       this.core.getWorkerRegistry().setHashrate(workerId, result.hashrateHps);
+      const current = this.controllers.get(workerId);
+      if (current === controller) this.controllers.delete(workerId);
       return result;
     });
   }
 
   stopWorker(workerId: string): void {
     const controller = this.controllers.get(workerId);
-    if (!controller) return;
-    controller.stop = true;
+    if (controller) controller.stop = true;
   }
 
   stopJob(jobId: string): void {
@@ -83,8 +81,7 @@ export class MinerWorkerRuntime {
 
   async waitForWorker(workerId: string): Promise<MiningEngineResult | undefined> {
     const controller = this.controllers.get(workerId);
-    if (!controller) return undefined;
-    return controller.promise;
+    return controller ? controller.promise : undefined;
   }
 
   async rollover(work: MiningWork): Promise<void> {
