@@ -1,3 +1,17 @@
-# Alerts Module
+# Alerts Core
 
-Operator alerts for verified system conditions: miner offline, pool disconnected, abnormal temperature, rejected-share anomaly, payout event, and service failure.
+The Alerts Core creates validated operational alerts from verified system events.
+
+Sources:
+- miner;
+- pool;
+- wallet;
+- profitability;
+- system.
+
+Severity:
+- info;
+- warning;
+- critical.
+
+The module does not invent telemetry or claim an external service failed unless an upstream verified event reports that condition. Alert creation is deterministic except for the generated alert identifier.
