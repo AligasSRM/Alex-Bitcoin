@@ -18,12 +18,13 @@ const boundary = {
 };
 
 const orchestrator = new BitcoinCoreTemplateRuntimeOrchestrator(core, boundary);
+const worker = core.getWorkerRegistry().register({ workerId: "worker-a", workerName: "Test Worker" });
+core.getWorkerRegistry().setState(worker.workerId, "online");
+
 assert.equal(await orchestrator.refreshWork(), "core-job-1");
 assert.equal(core.jobSnapshot()[0]?.jobId, "core-job-1");
 assert.throws(() => orchestrator.startWorker({ workerId: "missing", maxHashes: 1 }), /worker is not assigned/);
 
-const worker = core.getWorkerRegistry().register({ workerId: "worker-a", workerName: "Test Worker" });
-assert.equal(worker.workerId, "worker-a");
 const result = await orchestrator.startWorker({ workerId: "worker-a", maxHashes: 1 });
 assert.equal(result.jobId, "core-job-1");
 assert.equal(result.hashesTried, 1);
