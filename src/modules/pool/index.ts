@@ -7,3 +7,4 @@ export * from "./proxy";
 export * from "./upstream";
 export * from "./workers";
 export * from "./job-distribution";
+export * from "./branch-aware-share-router";
