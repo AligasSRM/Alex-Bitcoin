@@ -40,10 +40,12 @@ export class StratumMiningBridge {
 
   registerJob(work: MiningWork): void {
     this.shares.registerJob(work);
+    this.session.registerJob(work.jobId);
   }
 
   retireJob(jobId: string): void {
     this.shares.retireJob(jobId);
+    this.session.retireJob(jobId);
   }
 
   getStats(): PoolShareStats {
