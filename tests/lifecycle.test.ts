@@ -34,29 +34,31 @@ const result = await connectExternalAdapters(adapters);
 if (!result.ok || !result.connected.miner || !result.connected.pool || !result.connected.wallet) {
   throw new Error("adapter lifecycle connect failed");
 }
-if (!minerConnected || !poolConnected) throw new Error("adapters were not connected");
 
 await disconnectExternalAdapters(adapters);
 if (!minerDisconnected || !poolDisconnected || minerConnected || poolConnected) {
   throw new Error("adapter lifecycle disconnect failed");
 }
 
-let rollbackPoolDisconnected = false;
+let rollbackMinerDisconnected = false;
 const failingAdapters = {
   ...adapters,
+  miner: {
+    ...adapters.miner,
+    async disconnect() { rollbackMinerDisconnected = true; },
+  },
   pool: {
     ...adapters.pool,
     async connect() { throw new Error("pool unavailable"); },
-    async disconnect() { rollbackPoolDisconnected = true; },
   },
 };
 
 const failed = await connectExternalAdapters(failingAdapters);
-if (failed.ok || !failed.connected || !minerDisconnected) {
+if (failed.ok || failed.connected.miner || failed.connected.pool || failed.connected.wallet) {
   throw new Error("failed lifecycle was not fail-closed");
 }
-if (!failingAdapters.miner || rollbackPoolDisconnected) {
-  throw new Error("rollback behavior invalid");
+if (!rollbackMinerDisconnected) {
+  throw new Error("miner connection was not rolled back");
 }
 
 console.log("external adapter lifecycle tests passed");
