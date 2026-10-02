@@ -3,7 +3,7 @@
 Operator-facing mobile-first control dashboard structure.
 
 ## Current scope
-This commit defines the external dashboard structure only. It does not connect controls or metrics to production runtime yet.
+The dashboard now has a fail-closed runtime data contract and browser binding. It reads only an explicitly supplied `window.AlexBitcoinRuntime` snapshot; absent or invalid runtime data remains disconnected/N/A.
 
 ## Sections
 1. Runtime state and START/STOP controls.
@@ -17,6 +17,10 @@ This commit defines the external dashboard structure only. It does not connect c
 
 ## Data rule
 Until real runtime contracts are connected, unavailable values are rendered as N/A or NOT CONNECTED. The dashboard must never fabricate production telemetry, BTC rewards, profitability, connection state, or green status.
+
+## Runtime integration boundary
+
+The browser adapter listens for `alexbitcoin:runtime` and renders only validated runtime fields. It does not create telemetry, infer mining state, or start/stop mining. A production host must inject the real runtime snapshot and dispatch the event. Until that exists, the dashboard remains `NOT CONNECTED` and shows `N/A`.
 
 ## Future integration
 The dashboard will consume the existing runtime/status, pool, miner, wallet, alert, and production-activation boundaries. UI integration and real mining verification are separate from this structural build.
