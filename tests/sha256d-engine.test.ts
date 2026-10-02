@@ -9,7 +9,7 @@ const work = {
   headerPrefix76: prefix,
   nonceStart: genesisNonce,
   nonceEnd: genesisNonce,
-  targetHex: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  targetHex: "0000000000000000000000000000000000000000000000000000000000000000",
   createdAt: new Date().toISOString(),
 };
 
