@@ -6,6 +6,7 @@ import { MiningSolutionSubmissionBoundary } from "../src/modules/mining/solution
 
 const core = new MinerCore();
 core.getWorkerRegistry().register({ workerId: "worker-a", workerName: "Cycle Worker" });
+core.getWorkerRegistry().setState("worker-a", "online");
 
 const boundary = {
   async getBlockTemplate() {
