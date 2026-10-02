@@ -1,5 +1,5 @@
 import { MiningProxy } from "../src/modules/pool/proxy";
-import { MiningUpstreamBinding, UpstreamRecoverySupervisor, type UpstreamJobSource } from "../src/modules/pool/upstream";
+import { MiningUpstreamBinding, UpstreamRecoverySupervisor, type UpstreamJobSource, type UpstreamState } from "../src/modules/pool/upstream";
 import type { MiningWork } from "../src/modules/mining/types";
 
 const work: MiningWork = {
@@ -13,6 +13,7 @@ const work: MiningWork = {
 
 let jobHandler: ((job: MiningWork) => void) | undefined;
 let connected = false;
+let upstreamState: UpstreamState = "disconnected";
 let connectFailures = 0;
 let connectCalls = 0;
 let disconnectCalls = 0;
@@ -27,9 +28,14 @@ const upstream: UpstreamJobSource = {
       throw new Error("simulated upstream connect failure");
     }
     connected = true;
+    upstreamState = "connected";
   },
-  async disconnect() { connected = false; disconnectCalls += 1; },
-  getState() { return connected ? "connected" : "disconnected"; },
+  async disconnect() {
+    connected = false;
+    upstreamState = "disconnected";
+    disconnectCalls += 1;
+  },
+  getState() { return upstreamState; },
   onJob(handler) { jobHandler = handler; return () => { jobHandler = undefined; }; },
   async submitShare(request) { submitted.push(request.jobId); return request.jobId === "upstream-job"; },
 };
@@ -129,10 +135,25 @@ const recoveryA = supervisor.recover();
 const recoveryB = supervisor.recover();
 if (recoveryA !== recoveryB || !supervisor.isRecovering()) throw new Error("recovery was not serialized");
 await recoveryA;
-if (connectFailures !== 0 || !binding.snapshot().state || binding.snapshot().connectionGeneration !== 10) {
+if (connectFailures !== 0 || binding.snapshot().state !== "connected" || binding.snapshot().connectionGeneration !== 10) {
   throw new Error("recovery supervisor did not establish the expected generation");
 }
 if (supervisor.isRecovering()) throw new Error("recovery supervisor remained active after completion");
+if (await supervisor.recoverIfNeeded()) throw new Error("connected upstream triggered unnecessary recovery");
+
+upstreamState = "degraded";
+const degradedShare = await binding.submitShare({
+  workerId: "worker-a",
+  jobId: "upstream-job",
+  extranonce2: "00000001",
+  ntime: "65000000",
+  nonce: "00000001",
+});
+if (degradedShare || submitted.length !== 1) throw new Error("degraded upstream forwarded a share");
+
+if (!(await supervisor.recoverIfNeeded()) || binding.snapshot().state !== "connected" || binding.snapshot().connectionGeneration !== 12) {
+  throw new Error("degraded upstream did not recover through the supervisor");
+}
 
 await binding.disconnect();
 if (binding.snapshot().state !== "disconnected") throw new Error("upstream did not remain safely disconnected");
