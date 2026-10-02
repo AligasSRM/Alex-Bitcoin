@@ -72,7 +72,7 @@ const timeoutDeps = {
   },
 };
 const timeoutSnapshot = await collectCoreHealthSnapshot(timeoutDeps, { timeoutMs: 5 });
-if (!timeoutSnapshot.pool || !timeoutSnapshot.alerts.some((alert) => alert.code === "POOL_TIMEOUT")) {
+if (timeoutSnapshot.pool !== null || !timeoutSnapshot.alerts.some((alert) => alert.code === "POOL_TIMEOUT")) {
   throw new Error("pool timeout classification failed");
 }
 
