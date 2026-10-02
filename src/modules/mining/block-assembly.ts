@@ -99,7 +99,7 @@ export function assembleBitcoinBlock(template: BitcoinBlockTemplateData): Assemb
     throw new Error("merkle root does not match block transactions");
   }
   const header = serializeBitcoinBlockHeader(template.header);
-  const block = concat(header, encodeCompactSize(transactions.length), ...transactions.map(hexBytes));
+  const block = concat(header, encodeCompactSize(transactions.length), ...transactions.map((tx) => hexBytes(tx)));
   return {
     headerHex: Buffer.from(header).toString("hex"),
     merkleRootHex: merkleRoot,
