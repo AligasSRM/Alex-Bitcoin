@@ -3,3 +3,4 @@ export * from "./adapters";
 export * from "./runtime";
 export * from "./startup-gate";
 export * from "./lifecycle";
+export * from "./retry";
