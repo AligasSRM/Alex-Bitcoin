@@ -81,6 +81,7 @@ export class StratumSession {
   private authorizedWorker?: string;
   private readonly activeJobs = new Set<string>();
   private jobGeneration = 0;
+  private currentDifficulty?: number;
   private readonly extranonce1: string;
   private readonly extranonce2Size: number;
   private readonly options: StratumSessionOptions;
@@ -192,7 +193,12 @@ export class StratumSession {
     if (!Number.isFinite(difficulty) || difficulty <= 0) {
       throw new Error("difficulty must be positive and finite");
     }
+    this.currentDifficulty = difficulty;
     return { method: "mining.set_difficulty", params: [difficulty] };
+  }
+
+  getDifficulty(): number | undefined {
+    return this.currentDifficulty;
   }
 
   notifyJob(
