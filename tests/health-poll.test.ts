@@ -59,6 +59,24 @@ const snapshot = await poller.poll();
 if (!snapshot.miner || !snapshot.pool || !snapshot.wallet) throw new Error("health poll failed");
 
 let scheduledCalls = 0;
+let active = 0;
+let maxActive = 0;
+const slowDeps = {
+  ...deps,
+  miner: { ...deps.miner, async getTelemetry() {
+    active += 1;
+    maxActive = Math.max(maxActive, active);
+    await new Promise<void>((resolve) => setTimeout(resolve, 15));
+    active -= 1;
+    return deps.miner.getTelemetry();
+  }},
+};
+const overlapPoller = createHealthPoller(slowDeps, { intervalMs: 5, attempts: 1, delayMs: 0 });
+overlapPoller.start(() => {});
+await new Promise<void>((resolve) => setTimeout(resolve, 35));
+overlapPoller.stop();
+if (maxActive > 1) throw new Error("health polls overlapped");
+
 const scheduledPoller = createHealthPoller(deps, { intervalMs: 10, attempts: 1, delayMs: 0 });
 scheduledPoller.start(() => { scheduledCalls += 1; });
 await new Promise<void>((resolve) => setTimeout(resolve, 25));
