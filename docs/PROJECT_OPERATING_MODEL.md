@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 19.5 GREEN / CLOSED
-Next engineering section: 19.6
+Current locked stop point: Section 19.6 GREEN / CLOSED
+Next engineering section: 19.7
 
 ## 1. What this system is
 
@@ -108,6 +108,12 @@ Section 19.5 adds the upstream recovery supervisor:
 - competing reconnect generations are prevented
 - recovery state is observable through isRecovering()
 - the supervisor reuses the bounded 19.4 policy instead of creating a second retry mechanism.
+
+Section 19.6 adds the degraded-state recovery boundary:
+- share submission remains fail-closed unless upstream is fully connected
+- a connected upstream does not trigger unnecessary recovery
+- degraded/disconnected state can trigger the serialized recovery supervisor
+- recovery establishes a fresh connection generation through the existing bounded retry policy.
 
 ## 8. Failure/reconnect model
 
@@ -278,7 +284,7 @@ The planned dashboard model is informed by established mining-monitoring pattern
 
 ### Timing rule
 
-The dashboard work starts only after the core mining system has been completed and the relevant engineering sections are GREEN/CLOSED. The dashboard is therefore a later phase, not part of the current 19.6 work unless explicitly re-planned.
+The dashboard work starts only after the core mining system has been completed and the relevant engineering sections are GREEN/CLOSED. The dashboard is therefore a later phase, not part of the current 19.7 work unless explicitly re-planned.
 
 ## 13. Current locked position
 
@@ -287,8 +293,9 @@ Section 19.2 — Upstream Session Lifecycle: GREEN / CLOSED.
 Section 19.3 — Upstream Reconnect Boundary: GREEN / CLOSED.
 Section 19.4 — Fail-Closed Upstream Reconnect Retry Boundary: GREEN / CLOSED.
 Section 19.5 — Upstream Recovery Supervisor: GREEN / CLOSED.
+Section 19.6 — Degraded Upstream Recovery Boundary: GREEN / CLOSED.
 
-Current stop point: after 19.5.
-Next planned work: Section 19.6.
+Current stop point: after 19.6.
+Next planned work: Section 19.7.
 
 This document is the canonical reference for the operating model, modification/verification method, and the deferred control-dashboard architecture. It does not replace the source code, tests, CI evidence, or individual section records.
