@@ -7,3 +7,4 @@ export * from "./share";
 export * from "./miner-core";
 export * from "./bitcoin-core-boundary";
 export * from "./sha256d-engine";
+export * from "./miner-worker-runtime";

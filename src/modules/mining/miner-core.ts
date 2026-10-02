@@ -88,6 +88,11 @@ export class MinerCore {
     }));
   }
 
+  getActiveWork(jobId: string): MiningWork {
+    const work = this.requireJob(jobId);
+    return { ...work, headerPrefix76: new Uint8Array(work.headerPrefix76) };
+  }
+
   auditSnapshot(): MiningAuditEvent[] {
     return this.auditEvents.map((event) => ({ ...event }));
   }
