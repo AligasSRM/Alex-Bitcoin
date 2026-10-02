@@ -22,7 +22,7 @@ export interface StratumV1UpstreamOptions {
   extranonce2Size?: number;
   timeoutMs?: number;
   socketFactory?: (port: number, host: string) => Socket;
-  jobToMiningWork: (job: StratumV1Job, extranonce1: string, extranonce2Size: number) => MiningWork;
+  jobToMiningWork: (job: StratumV1Job, extranonce1: string, extranonce2Size: number, shareTargetHex: string) => MiningWork;
 }
 
 export class StratumV1UpstreamClient implements UpstreamJobSource {
@@ -32,6 +32,7 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
   private nextId = 1;
   private buffer = "";
   private extranonce1?: string;
+  private shareTargetHex = "00000000ffff0000000000000000000000000000000000000000000000000000";
   private jobHandler?: (work: MiningWork) => void;
   private readonly pending = new Map<number, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: NodeJS.Timeout }>();
 
@@ -108,6 +109,10 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
     return this.state;
   }
 
+  getShareTargetHex(): string {
+    return this.shareTargetHex;
+  }
+
   onJob(handler: (work: MiningWork) => void): () => void {
     this.jobHandler = handler;
     return () => {
@@ -158,6 +163,18 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
     if (!message || typeof message !== "object") return;
     const value = message as Record<string, unknown>;
 
+    if (value.method === "mining.set_difficulty" && Array.isArray(value.params) && typeof value.params[0] === "number") {
+      const difficulty = value.params[0];
+      if (Number.isFinite(difficulty) && difficulty > 0) {
+        const scaled = 0x00000000ffff0000000000000000000000000000000000000000000000000000n * 1000000000000000000n;
+        const divisor = BigInt(Math.round(difficulty * 1000000000000000000));
+        if (divisor > 0n) this.shareTargetHex = (scaled / divisor).toString(16).padStart(64, "0");
+      } else {
+        this.state = "degraded";
+      }
+      return;
+    }
+
     if (value.id !== undefined && typeof value.id === "number") {
       const pending = this.pending.get(value.id);
       if (!pending) return;
@@ -186,7 +203,7 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
       cleanJobs: p[8] === true,
     };
     try {
-      const work = this.options.jobToMiningWork(job, this.extranonce1, this.options.extranonce2Size);
+      const work = this.options.jobToMiningWork(job, this.extranonce1, this.options.extranonce2Size, this.shareTargetHex);
       this.jobHandler?.(work);
     } catch {
       this.state = "degraded";
