@@ -22,7 +22,7 @@ This project does not simulate mining or fabricate rewards.
 
 ## Current Stage
 
-STAGE 4A.5 — BITCOIN CORE RPC / REGTEST BOUNDARY: GREEN / CLOSED
+STAGE 4A.6 — CORE MINING WORK BRIDGE + STRATUM BRIDGE: IMPLEMENTED / TEST PENDING
 
 ## Principles
 
@@ -58,6 +58,7 @@ STAGE 4A.5 — BITCOIN CORE RPC / REGTEST BOUNDARY: GREEN / CLOSED
 - Stage 4A.3 — Real Miner Worker Runtime: GREEN / CLOSED
 - Stage 4A.4 — Bitcoin Block Assembly Core: GREEN / CLOSED
 - Stage 4A.5 — Bitcoin Core RPC / Regtest Boundary: GREEN / CLOSED
+- Stage 4A.6 — Core Mining Work Bridge + Stratum Bridge: IMPLEMENTED / TEST PENDING (final runtime verification on Windows required)
 - SHA-256d double-hash execution: PASS
 - Bitcoin target comparison: PASS
 - Real nonce scanning: PASS
@@ -98,3 +99,58 @@ Alex Bitcoin is seeking lawful technology and infrastructure partnerships with e
 ## Final Sequence
 
 DESIGN → BUILD → TEST → INTEGRATION TEST → REGRESSION TEST → SECURITY CHECK → FINAL VERIFY → LOCK
+
+
+## Official Project Baseline & Stop Point
+
+This section is the single source of truth for the current Alex Bitcoin execution state.
+
+### Locked Stages — Do Not Reopen Without a Proven Technical Failure
+
+- Stage 4A.1 — GREEN / CLOSED
+- Stage 4A.2 — GREEN / CLOSED
+- Stage 4A.3 — GREEN / CLOSED
+- Stage 4A.4 — GREEN / CLOSED
+- Stage 4A.5 — GREEN / CLOSED
+
+### Current Work
+
+- Stage 4A.6 — Core Mining Work Bridge + Stratum Bridge
+- Code implemented.
+- Integration test updated to exercise Stratum subscribe → authorize → submit.
+- Final runtime verification is pending on the project's Windows environment.
+- Do not mark Stage 4A.6 GREEN / CLOSED until the real test command completes successfully.
+
+### Dashboard
+
+The dashboard runtime contract and dashboard work are part of the project. The existing dashboard UI is not to be rebuilt from scratch or replaced without a proven need. The next dashboard action is deployment of the existing UI to a verified public web/PWA endpoint after its actual frontend files are identified in the project environment.
+
+### Partnership Outreach — No Duplicate Contact
+
+| Partner | Contact | Status | Date |
+|---|---|---|---|
+| Open Mine | max@openmine.io | SENT / WAITING | 2026-10-03 |
+| HashEra | g.cyr@hashera.io | SENT / WAITING | 2026-10-03 |
+| HashStrike | hashstrike@mineshop.eu | SENT / WAITING | 2026-10-03 |
+
+No additional outreach to these three partners should be sent unless a new response or a specific follow-up condition exists.
+
+### Production Activation Dependencies
+
+The following are external dependencies, not reasons to rewrite already-locked core stages:
+
+1. Verified external mining operator / ASIC capacity.
+2. Real mining-pool account and Stratum endpoint.
+3. Real Bitcoin wallet destination.
+4. Commercial/KYC/legal requirements imposed by the selected partner.
+5. Verified monitoring, accounting and settlement path for the selected production partner.
+
+### Repository Hygiene Rule
+
+Do not delete or rewrite project files solely because they look unused. A file may be part of a locked contract, test, compatibility boundary, documentation record, or future integration. Cleanup requires evidence that a file is duplicate, obsolete, generated, secret-bearing, corrupted, or otherwise outside the approved project architecture.
+
+### Execution Rule
+
+Inspect → Decide → Execute → Test → Verify → Lock → Next.
+
+Never invent a stage number, integration result, deployment URL, partner response, production hashrate, or financial result.
