@@ -47,6 +47,32 @@ export interface DashboardRuntimeSnapshot {
     configured: boolean;
     address: string | null;
   };
+  asic: {
+    boardCount: number | null;
+    chipCount: number | null;
+    frequencyMHz: number | null;
+    hardwareErrors: number | null;
+    fanRpm: number | null;
+    status: string | null;
+  };
+  network: {
+    internetConnected: boolean | null;
+    latencyMs: number | null;
+    reconnects: number | null;
+    lastError: string | null;
+  };
+  events: Array<{
+    at: string;
+    severity: "info" | "warning" | "error";
+    source: string;
+    message: string;
+  }>;
+  financial: {
+    btcEarned: number | null;
+    electricityCost: number | null;
+    profitLoss: number | null;
+    verified: boolean;
+  };
 }
 
 export type DashboardRuntimeInput = Partial<DashboardRuntimeSnapshot> & {
