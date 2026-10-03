@@ -10,7 +10,7 @@ This project does not simulate mining or fabricate rewards.
 
 ## Current Stage
 
-STAGE 4A.2 — REAL SHA-256d MINING ENGINE: VERIFIED
+STAGE 4A.2 — REAL SHA-256d MINING ENGINE: GREEN / CLOSED
 
 ## Principles
 
@@ -42,7 +42,7 @@ STAGE 4A.2 — REAL SHA-256d MINING ENGINE: VERIFIED
 - Stage 3.5 — Secrets/Security Boundary: VERIFIED
 - Stage 3.6 — Integration + Regression Tests: GREEN
 - Stage 4A.1 — Miner Core Architecture: GREEN / CLOSED
-- Stage 4A.2 — Real SHA-256d Mining Engine: VERIFIED
+- Stage 4A.2 — Real SHA-256d Mining Engine: GREEN / CLOSED
 - SHA-256d double-hash execution: PASS
 - Bitcoin target comparison: PASS
 - Real nonce scanning: PASS
