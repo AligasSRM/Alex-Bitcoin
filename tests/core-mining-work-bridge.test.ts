@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { BitcoinCoreStratumWorkBridge, miningWorkFromBitcoinCoreTemplate } from "../src/modules/mining/core-mining-work-bridge";
 import { StratumMiningBridge } from "../src/modules/pool/bridge";
+import type { StratumResponse } from "../src/modules/pool/stratum";
 
 const template = {
   jobId: "regtest-job",
@@ -41,19 +42,24 @@ const core = {
 };
 const coreStratum = new BitcoinCoreStratumWorkBridge(core, stratum);
 const bridged = await coreStratum.refreshWork();
+
+function expectRpcResponse(value: StratumResponse | unknown[]): StratumResponse {
+  assert.ok(!Array.isArray(value), "expected Stratum RPC response");
+  return value;
+}
 assert.equal(bridged.jobId, "core-stratum-job-1");
 assert.equal(coreStratum.getActiveJobId(), "core-stratum-job-1");
-assert.equal((await stratum.handleLine(JSON.stringify({
+assert.equal(expectRpcResponse(await stratum.handleLine(JSON.stringify({
   id: 1,
   method: "mining.subscribe",
   params: [],
 }))).error, null);
-assert.equal((await stratum.handleLine(JSON.stringify({
+assert.equal(expectRpcResponse(await stratum.handleLine(JSON.stringify({
   id: 2,
   method: "mining.authorize",
   params: ["rig-1", "x"],
 }))).result, true);
-assert.equal((await stratum.handleLine(JSON.stringify({
+assert.equal(expectRpcResponse(await stratum.handleLine(JSON.stringify({
   id: 3,
   method: "mining.submit",
   params: ["rig-1", "core-stratum-job-1", "00000001", "65000000", "00000000"],
