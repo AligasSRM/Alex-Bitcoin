@@ -5,7 +5,7 @@ import { StratumMiningBridge } from "../src/modules/pool/bridge";
 const template = {
   jobId: "regtest-job",
   headerPrefix76: new Uint8Array(76),
-  targetHex: "ab".repeat(32),
+  targetHex: "ff".repeat(32),
   createdAt: "2026-10-02T18:00:00.000Z",
 };
 
@@ -14,7 +14,7 @@ assert.equal(work.jobId, "regtest-job");
 assert.equal(work.headerPrefix76.length, 76);
 assert.equal(work.nonceStart, 0);
 assert.equal(work.nonceEnd, 0xffffffff);
-assert.equal(work.targetHex, "ab".repeat(32));
+assert.equal(work.targetHex, "ff".repeat(32));
 assert.equal(work.createdAt, template.createdAt);
 
 assert.throws(
@@ -43,13 +43,21 @@ const coreStratum = new BitcoinCoreStratumWorkBridge(core, stratum);
 const bridged = await coreStratum.refreshWork();
 assert.equal(bridged.jobId, "core-stratum-job-1");
 assert.equal(coreStratum.getActiveJobId(), "core-stratum-job-1");
-assert.equal(stratum.shares.submit({
-  workerId: "rig-1",
-  jobId: "core-stratum-job-1",
-  extranonce2: "00000001",
-  ntime: "65000000",
-  nonce: "00000000",
-}).acceptedForPool, true);
+assert.equal((await stratum.handleLine(JSON.stringify({
+  id: 1,
+  method: "mining.subscribe",
+  params: [],
+}))).error, null);
+assert.equal((await stratum.handleLine(JSON.stringify({
+  id: 2,
+  method: "mining.authorize",
+  params: ["rig-1", "x"],
+}))).result, true);
+assert.equal((await stratum.handleLine(JSON.stringify({
+  id: 3,
+  method: "mining.submit",
+  params: ["rig-1", "core-stratum-job-1", "00000001", "65000000", "00000000"],
+}))).result, true);
 
 core.getBlockTemplate = async () => ({ ...template, jobId: "core-stratum-job-2" });
 await coreStratum.refreshWork();
