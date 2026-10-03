@@ -2,6 +2,18 @@
 
 Real Bitcoin mining control and monitoring system.
 
+## Official Project Contact
+
+**Alex Bitcoin**  
+Mining Infrastructure & Technology  
+Real Bitcoin Mining Infrastructure  
+Stratum • Mining Operations • Monitoring • Routing • Settlement
+
+**Official email:** alexbitcoin.tech@proton.me  
+**GitHub:** https://github.com/AligasSRM/Alex-Bitcoin
+
+Alex Bitcoin is a technology and infrastructure project focused on real Bitcoin mining operations and verified external mining capacity. The project does not claim to be a legally incorporated company unless and until a legal entity is formally established.
+
 ## Real Mining Flow
 
 ASIC Miner → Mining Pool → BTC → Wallet
@@ -68,6 +80,21 @@ STAGE 4A.5 — BITCOIN CORE RPC / REGTEST BOUNDARY: GREEN / CLOSED
 
 The software mining engine is verified through Stage 4A.5. Live Bitcoin mining is **not** claimed yet. Production activation still requires an actual ASIC miner, a real mining-pool account/endpoint, and a real Bitcoin wallet address to be configured through runtime configuration/secrets. Until those external dependencies are present and verified, the system remains fail-closed and does not fabricate mining activity or BTC rewards.
 
-Final sequence:
+## Official Contact Readiness
+
+- Official Proton Mail account: configured
+- Two-factor authentication: enabled
+- Official display name: Alex Bitcoin
+- Official email signature: configured and verified
+- Proton → Gmail delivery test: PASS
+- Gmail → Proton reply test: PASS
+- Gmail spam classification was corrected with “Not spam” during the test
+- No passwords, 2FA secrets, or recovery secrets are stored in the repository
+
+## Partnership Position
+
+Alex Bitcoin is seeking lawful technology and infrastructure partnerships with external mining operators/providers. The intended model is to connect verified external mining capacity through appropriate technical integrations while keeping operator-owned hardware under the operator's control. No hardware ownership, purchased hashrate, or fabricated production capacity is claimed by this project.
+
+## Final Sequence
 
 DESIGN → BUILD → TEST → INTEGRATION TEST → REGRESSION TEST → SECURITY CHECK → FINAL VERIFY → LOCK
