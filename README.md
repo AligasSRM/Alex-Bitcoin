@@ -10,7 +10,7 @@ This project does not simulate mining or fabricate rewards.
 
 ## Current Stage
 
-STAGE 4A.3 — REAL MINER WORKER RUNTIME: GREEN / CLOSED
+STAGE 4A.4 — BITCOIN BLOCK ASSEMBLY CORE: GREEN / CLOSED
 
 ## Principles
 
@@ -44,6 +44,7 @@ STAGE 4A.3 — REAL MINER WORKER RUNTIME: GREEN / CLOSED
 - Stage 4A.1 — Miner Core Architecture: GREEN / CLOSED
 - Stage 4A.2 — Real SHA-256d Mining Engine: GREEN / CLOSED
 - Stage 4A.3 — Real Miner Worker Runtime: GREEN / CLOSED
+- Stage 4A.4 — Bitcoin Block Assembly Core: GREEN / CLOSED
 - SHA-256d double-hash execution: PASS
 - Bitcoin target comparison: PASS
 - Real nonce scanning: PASS
@@ -51,11 +52,16 @@ STAGE 4A.3 — REAL MINER WORKER RUNTIME: GREEN / CLOSED
 - Worker job assignment and rollover: PASS
 - Worker stop-signal handling: PASS
 - Real measured hashrate telemetry: PASS
+- Transaction ID / double-SHA-256 calculation: PASS
+- Merkle root construction: PASS
+- 80-byte Bitcoin block-header serialization: PASS
+- Full block assembly and transaction-count encoding: PASS
+- Merkle mismatch rejected fail-closed: PASS
 - Invalid engine parameters fail closed: PASS
 
 ## Production Activation Gate
 
-The software mining engine is verified through Stage 4A.3. Live Bitcoin mining is **not** claimed yet. Production activation still requires an actual ASIC miner, a real mining-pool account/endpoint, and a real Bitcoin wallet address to be configured through runtime configuration/secrets. Until those external dependencies are present and verified, the system remains fail-closed and does not fabricate mining activity or BTC rewards.
+The software mining engine is verified through Stage 4A.4. Live Bitcoin mining is **not** claimed yet. Production activation still requires an actual ASIC miner, a real mining-pool account/endpoint, and a real Bitcoin wallet address to be configured through runtime configuration/secrets. Until those external dependencies are present and verified, the system remains fail-closed and does not fabricate mining activity or BTC rewards.
 
 Final sequence:
 
