@@ -10,7 +10,7 @@ This project does not simulate mining or fabricate rewards.
 
 ## Current Stage
 
-STAGE 4A.4 — BITCOIN BLOCK ASSEMBLY CORE: GREEN / CLOSED
+STAGE 4A.5 — BITCOIN CORE RPC / REGTEST BOUNDARY: GREEN / CLOSED
 
 ## Principles
 
@@ -45,6 +45,7 @@ STAGE 4A.4 — BITCOIN BLOCK ASSEMBLY CORE: GREEN / CLOSED
 - Stage 4A.2 — Real SHA-256d Mining Engine: GREEN / CLOSED
 - Stage 4A.3 — Real Miner Worker Runtime: GREEN / CLOSED
 - Stage 4A.4 — Bitcoin Block Assembly Core: GREEN / CLOSED
+- Stage 4A.5 — Bitcoin Core RPC / Regtest Boundary: GREEN / CLOSED
 - SHA-256d double-hash execution: PASS
 - Bitcoin target comparison: PASS
 - Real nonce scanning: PASS
@@ -57,11 +58,15 @@ STAGE 4A.4 — BITCOIN BLOCK ASSEMBLY CORE: GREEN / CLOSED
 - 80-byte Bitcoin block-header serialization: PASS
 - Full block assembly and transaction-count encoding: PASS
 - Merkle mismatch rejected fail-closed: PASS
+- Bitcoin Core JSON-RPC getblocktemplate boundary: PASS
+- Bitcoin Core JSON-RPC submitblock boundary: PASS
+- Regtest RPC authentication and response validation: PASS
+- Invalid block submission rejected fail-closed: PASS
 - Invalid engine parameters fail closed: PASS
 
 ## Production Activation Gate
 
-The software mining engine is verified through Stage 4A.4. Live Bitcoin mining is **not** claimed yet. Production activation still requires an actual ASIC miner, a real mining-pool account/endpoint, and a real Bitcoin wallet address to be configured through runtime configuration/secrets. Until those external dependencies are present and verified, the system remains fail-closed and does not fabricate mining activity or BTC rewards.
+The software mining engine is verified through Stage 4A.5. Live Bitcoin mining is **not** claimed yet. Production activation still requires an actual ASIC miner, a real mining-pool account/endpoint, and a real Bitcoin wallet address to be configured through runtime configuration/secrets. Until those external dependencies are present and verified, the system remains fail-closed and does not fabricate mining activity or BTC rewards.
 
 Final sequence:
 
