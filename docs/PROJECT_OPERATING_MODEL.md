@@ -318,6 +318,32 @@ The planned dashboard model is informed by established mining-monitoring pattern
 
 The dashboard work starts only after the core mining system has been completed and the relevant engineering sections are GREEN/CLOSED. The dashboard is therefore a later phase, not part of the current 19.9 work unless explicitly re-planned.
 
+## 13. Section 22 — Operator Dashboard Runtime Integration
+
+Section 22 formalizes the operator dashboard phase already implemented in the repository after Section 21.
+
+Scope verified in the repository:
+- mobile-first operator dashboard structure
+- fail-closed typed runtime snapshot contract
+- browser runtime binding through `window.AlexBitcoinRuntime` and `alexbitcoin:runtime`
+- verified core-health → dashboard runtime mapping
+- operator telemetry panels for hashrate, temperature, power, efficiency, shares, pool/Stratum/job/wallet, ASIC/network telemetry, live events, and verified financial fields
+- unavailable or unverified production values remain `N/A` / `NOT CONNECTED`
+- dashboard does not fabricate telemetry, profitability, mining state, or production control actions
+- dashboard control buttons remain disabled until a real production control boundary exists
+
+Verification evidence:
+- dashboard runtime contract regression test is included in the repository test chain
+- core-to-dashboard mapper has dedicated regression coverage
+- fail-closed browser runtime publisher and loading order are implemented
+- latest `main` CI run for commit `ae56b438405bc59fe95171effa2f45cde353f7da` completed successfully
+- the dashboard work predates the current locked main baseline and is unchanged by the subsequent Stage 4A.6 verification commits
+
+Section 22 boundary:
+- dashboard presentation and runtime observation are GREEN/CLOSED
+- real ASIC control, real pool activation, real mining start/stop execution, and production financial activation remain outside this section
+- those capabilities require their own verified runtime/control/external-dependency boundaries and must not be implied by the dashboard UI.
+
 ## 13. Current locked position
 
 Section 19.1 — Stratum Session + Job Lifecycle Boundary: GREEN / CLOSED.
