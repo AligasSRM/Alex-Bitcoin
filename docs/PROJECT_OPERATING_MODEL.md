@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 23 GREEN / CLOSED
-Next engineering section: 24
+Current locked stop point: Section 25 GREEN / CLOSED
+Next engineering section: 26
 
 ## 1. What this system is
 
@@ -405,6 +405,62 @@ Boundary:
 - a concrete vendor/protocol adapter remains required before live hardware activation.
 
 Current verification status: Section 25 — GREEN / CLOSED.
+## 18. Section 26 — Central Alex Control & Inspection Layer
+
+Section 26 establishes the central system-facing control/inspection boundary for the whole existing Alex Bitcoin system. It is not limited to START/STOP. Alex receives one typed, sanitized view that links every existing operational area while preserving each area's own safety boundary.
+
+Linked operational areas:
+- Core and health;
+- miner / ASIC runtime;
+- pool / upstream;
+- Stratum/session;
+- jobs;
+- shares;
+- telemetry;
+- dashboard runtime;
+- wallet status;
+- profitability;
+- alerts/events;
+- lifecycle;
+- security/fail-closed state;
+- verification/regression state;
+- production-readiness state.
+
+Rules:
+- existing contracts remain authoritative; Section 26 does not duplicate or bypass them;
+- sections that have no verified runtime data remain unavailable rather than being fabricated;
+- sections that are observation-only remain read-only;
+- START/STOP still delegate exclusively through ProductionMiningControl;
+- every command is followed by a fresh whole-system inspection;
+- failures remain explicit and fail closed;
+- the central result includes a complete section registry so missing integration is detectable by regression tests.
+
+### Secrets boundary — isolated
+
+Secrets are deliberately outside the Alex control surface.
+
+The boundary may expose only a secret-state classification such as:
+- configured;
+- missing;
+- invalid;
+- unavailable.
+
+It must never expose:
+- passwords;
+- login credentials;
+- API secrets;
+- access tokens;
+- private keys;
+- wallet seed phrases;
+- wallet private keys;
+- other secret storage values.
+
+The regression suite serializes the central result and verifies that secret material cannot cross this boundary.
+
+Section 26 therefore provides the central "eyes and hands" integration layer, while the individual modules remain responsible for their own validation, lifecycle, security and fail-closed behavior.
+
+Current verification status: Section 26 — GREEN / CLOSED.
+
 ## 18. Current locked position
 
 Section 19.1 — Stratum Session + Job Lifecycle Boundary: GREEN / CLOSED.
@@ -421,6 +477,8 @@ Section 21 — Share Validation Boundary: GREEN / CLOSED.
 Section 22 — Operator Dashboard Runtime Integration: GREEN / CLOSED.
 Section 23 — Mining Control Boundary: GREEN / CLOSED.
 Section 24 — Production Mining Control Runtime Binding: GREEN / CLOSED.
+Section 25 — ASIC Miner Runtime Adapter Boundary: GREEN / CLOSED.
+Section 26 — Alex External Control / Inspection Boundary: GREEN / CLOSED.
 
-Current locked stop point: Section 25 — GREEN / CLOSED.
-Next engineering section: 26
+Current locked stop point: Section 26 — GREEN / CLOSED.
+Active engineering section: None — Section 26 is locked.
