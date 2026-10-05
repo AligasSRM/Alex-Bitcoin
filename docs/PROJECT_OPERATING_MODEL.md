@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 23 GREEN / CLOSED
-Next engineering section: 24
+Current locked stop point: Section 25 GREEN / CLOSED
+Next engineering section: 26
 
 ## 1. What this system is
 
@@ -459,7 +459,7 @@ The regression suite serializes the central result and verifies that secret mate
 
 Section 26 therefore provides the central "eyes and hands" integration layer, while the individual modules remain responsible for their own validation, lifecycle, security and fail-closed behavior.
 
-Current verification status: Section 26 — IN VERIFICATION.
+Current verification status: Section 26 — GREEN / CLOSED.
 
 ## 18. Current locked position
 
@@ -478,7 +478,7 @@ Section 22 — Operator Dashboard Runtime Integration: GREEN / CLOSED.
 Section 23 — Mining Control Boundary: GREEN / CLOSED.
 Section 24 — Production Mining Control Runtime Binding: GREEN / CLOSED.
 Section 25 — ASIC Miner Runtime Adapter Boundary: GREEN / CLOSED.
-Section 26 — Alex External Control / Inspection Boundary: IN VERIFICATION.
+Section 26 — Alex External Control / Inspection Boundary: GREEN / CLOSED.
 
-Current locked stop point: Section 25 — GREEN / CLOSED.
-Active engineering section: 26 — Alex External Control / Inspection Boundary.
+Current locked stop point: Section 26 — GREEN / CLOSED.
+Active engineering section: None — Section 26 is locked.
