@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 22 GREEN / CLOSED
-Next engineering section: 23
+Current locked stop point: Section 23 GREEN / CLOSED
+Next engineering section: 24
 
 ## 1. What this system is
 
@@ -365,7 +365,28 @@ Section 23 boundary:
 - it does not claim a live pool session or real Bitcoin mining
 - production activation remains gated by the existing production activation boundary and real external dependencies
 
-## 15. Current locked position
+## 15. Section 24 — Production Mining Control Runtime Binding
+
+Section 24 binds the Section 23 mining START/STOP control boundary to the existing external adapter lifecycle.
+
+Implemented:
+- production control starts through the existing external adapter lifecycle
+- miner and pool connections are established before mining START
+- wallet status is validated as part of the existing lifecycle gate
+- the real miner control boundary is invoked only after the external lifecycle succeeds
+- failed mining START is rolled back through the external lifecycle
+- successful STOP stops the mining control first, then disconnects the external runtime
+- successful STOP leaves the control state stopped and the external lifecycle disconnected
+- dedicated regression coverage verifies start, stop, and failed-start rollback
+
+Section 24 boundary:
+- this is the runtime orchestration binding between the control contract and external adapters
+- it does not claim a physical ASIC is connected
+- it does not claim a live pool account/session or accepted production shares
+- it does not claim production BTC rewards, settlement, or financial activation
+- production activation remains gated by real external infrastructure and verified deployment/runtime configuration
+
+## 16. Current locked position
 
 Section 19.1 — Stratum Session + Job Lifecycle Boundary: GREEN / CLOSED.
 Section 19.2 — Upstream Session Lifecycle: GREEN / CLOSED.
@@ -380,5 +401,6 @@ Section 20 — Stratum Runtime Share-Target Binding: GREEN / CLOSED.
 Section 21 — Share Validation Boundary: GREEN / CLOSED.
 Section 22 — Operator Dashboard Runtime Integration: GREEN / CLOSED.
 Section 23 — Mining Control Boundary: GREEN / CLOSED.
+Section 24 — Production Mining Control Runtime Binding: IN VERIFICATION.
 
-Current stop point: after Section 23 — GREEN / CLOSED.
+Current stop point: Section 24 is in verification.
