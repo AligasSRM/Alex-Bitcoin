@@ -344,7 +344,28 @@ Section 22 boundary:
 - real ASIC control, real pool activation, real mining start/stop execution, and production financial activation remain outside this section
 - those capabilities require their own verified runtime/control/external-dependency boundaries and must not be implied by the dashboard UI.
 
-## 13. Current locked position
+
+## 14. Section 23 — Mining Control Boundary
+
+Section 23 establishes the fail-closed control boundary for real mining START/STOP commands.
+
+Implemented:
+- typed mining control state machine: stopped / starting / mining / stopping / error
+- explicit START boundary that requires a miner adapter start capability
+- explicit STOP boundary that requires a miner adapter stop capability
+- duplicate START rejection while starting/mining
+- duplicate STOP rejection while stopped
+- failed or unavailable control paths never report successful mining
+- control failures transition to an explicit error state
+- dedicated regression coverage included in the repository test chain
+
+Section 23 boundary:
+- this is the control contract and safety boundary only
+- it does not claim that a physical ASIC is connected
+- it does not claim a live pool session or real Bitcoin mining
+- production activation remains gated by the existing production activation boundary and real external dependencies
+
+## 15. Current locked position
 
 Section 19.1 — Stratum Session + Job Lifecycle Boundary: GREEN / CLOSED.
 Section 19.2 — Upstream Session Lifecycle: GREEN / CLOSED.
@@ -356,8 +377,8 @@ Section 19.7 — Stratum Difficulty State Boundary: GREEN / CLOSED.
 Section 19.8 — Stratum Difficulty Lifecycle Boundary: GREEN / CLOSED.
 Section 19.9 — Stratum Difficulty Target Boundary: GREEN / CLOSED.
 Section 20 — Stratum Runtime Share-Target Binding: GREEN / CLOSED.
+Section 21 — Share Validation Boundary: GREEN / CLOSED.
+Section 22 — Operator Dashboard Runtime Integration: GREEN / CLOSED.
+Section 23 — Mining Control Boundary: IN VERIFICATION.
 
-Current stop point: after Section 22.
-Next planned work: Section 23.
-
-This document is the canonical reference for the operating model, modification/verification method, and the deferred control-dashboard architecture. It does not replace the source code, tests, CI evidence, or individual section records.
+Current stop point: after Section 23 implementation and verification.
