@@ -405,6 +405,29 @@ Boundary:
 - a concrete vendor/protocol adapter remains required before live hardware activation.
 
 Current verification status: Section 25 — GREEN / CLOSED.
+## 18. Section 26 — Alex External Control / Inspection Boundary
+
+Section 26 establishes the system-facing control boundary that allows an external Alex control layer to inspect verified runtime state and invoke the already-verified mining START/STOP path.
+
+Implemented:
+- typed `inspect`, `start_mining`, and `stop_mining` commands;
+- inspection reads the verified Core Health boundary and converts it to the existing fail-closed dashboard runtime contract;
+- command execution delegates to `ProductionMiningControl` rather than bypassing Section 23/24 safety boundaries;
+- every control command is followed by a fresh runtime inspection result;
+- explicit capability reporting shows whether START/STOP are actually exposed by the bound miner;
+- control failures remain explicit and fail closed;
+- no wallet seed/private key, credentials, or other secrets are exposed through the control result;
+- dedicated regression coverage verifies inspect, start, stop, capability reporting, and failed-control behavior.
+
+External-control boundary:
+- this is a safe system-facing interface for an external tool/agent such as Alex;
+- it does not mean ChatGPT can directly access a user's PC or ASIC without an actual connected runtime/connector;
+- it does not invent telemetry or production state;
+- it does not bypass the production activation gate, miner adapter, pool lifecycle, Stratum lifecycle, or mining-control safety boundaries;
+- a concrete deployment transport/API and a real ASIC/pool runtime remain required for live external operation.
+
+Current verification status: Section 26 — IN VERIFICATION.
+
 ## 18. Current locked position
 
 Section 19.1 — Stratum Session + Job Lifecycle Boundary: GREEN / CLOSED.
@@ -423,4 +446,4 @@ Section 23 — Mining Control Boundary: GREEN / CLOSED.
 Section 24 — Production Mining Control Runtime Binding: GREEN / CLOSED.
 
 Current locked stop point: Section 25 — GREEN / CLOSED.
-Next engineering section: 26
+Active engineering section: 26 — Alex External Control / Inspection Boundary.
