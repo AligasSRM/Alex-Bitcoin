@@ -386,7 +386,26 @@ Section 24 boundary:
 - it does not claim production BTC rewards, settlement, or financial activation
 - production activation remains gated by real external infrastructure and verified deployment/runtime configuration
 
-## 16. Current locked position
+
+## 17. Section 25 — ASIC Miner Runtime Adapter Boundary
+
+Section 25 defines the verified software contract for a real ASIC miner runtime without pretending that a physical ASIC is connected.
+
+Scope:
+- explicit ASIC runtime identity and endpoint boundary;
+- required connect/disconnect lifecycle inherited from MinerAdapter;
+- required START/STOP mining controls;
+- validated telemetry contract remains the source of miner observations;
+- fail-closed validation when the ASIC control boundary or endpoint is incomplete;
+- dedicated regression coverage for the ASIC runtime contract.
+
+Boundary:
+- Section 25 does not claim a physical ASIC is connected;
+- it does not claim a vendor-specific ASIC protocol, IP address, credentials, live hashrate, pool session, or accepted shares;
+- a concrete vendor/protocol adapter remains required before live hardware activation.
+
+Current verification status: Section 25 — IN VERIFICATION.
+## 18. Current locked position
 
 Section 19.1 — Stratum Session + Job Lifecycle Boundary: GREEN / CLOSED.
 Section 19.2 — Upstream Session Lifecycle: GREEN / CLOSED.
@@ -404,4 +423,4 @@ Section 23 — Mining Control Boundary: GREEN / CLOSED.
 Section 24 — Production Mining Control Runtime Binding: GREEN / CLOSED.
 
 Current locked stop point: Section 24 — GREEN / CLOSED.
-Next engineering section: 25
+Next engineering section: 25 — ASIC Miner Runtime Adapter Boundary
