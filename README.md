@@ -22,7 +22,7 @@ This project does not simulate mining or fabricate rewards.
 
 ## Current Stage
 
-STAGE 4A.6 — CORE MINING WORK BRIDGE + STRATUM BRIDGE: IMPLEMENTED / TEST PENDING
+STAGE 4A.6 — CORE MINING WORK BRIDGE + STRATUM BRIDGE: GREEN / CLOSED
 
 ## Principles
 
@@ -32,14 +32,6 @@ STAGE 4A.6 — CORE MINING WORK BRIDGE + STRATUM BRIDGE: IMPLEMENTED / TEST PEND
 - Real miner and pool data only
 - Test before lock
 - Binance is not a dependency
-
-## Integrated External Adapters
-
-- CGMiner-compatible ASIC telemetry adapter over TCP
-- HTTP pool telemetry adapter with timeout and payload validation
-- Bitcoin address balance adapter using a real public Bitcoin API
-- External adapter integration tests using local protocol-compatible services
-- No simulated production hashrate, rewards, or balances
 
 ## Current Verified Status
 
@@ -58,7 +50,7 @@ STAGE 4A.6 — CORE MINING WORK BRIDGE + STRATUM BRIDGE: IMPLEMENTED / TEST PEND
 - Stage 4A.3 — Real Miner Worker Runtime: GREEN / CLOSED
 - Stage 4A.4 — Bitcoin Block Assembly Core: GREEN / CLOSED
 - Stage 4A.5 — Bitcoin Core RPC / Regtest Boundary: GREEN / CLOSED
-- Stage 4A.6 — Core Mining Work Bridge + Stratum Bridge: IMPLEMENTED / TEST PENDING (final runtime verification on Windows required)
+- Stage 4A.6 — Core Mining Work Bridge + Stratum Bridge: GREEN / CLOSED
 - SHA-256d double-hash execution: PASS
 - Bitcoin target comparison: PASS
 - Real nonce scanning: PASS
@@ -79,27 +71,11 @@ STAGE 4A.6 — CORE MINING WORK BRIDGE + STRATUM BRIDGE: IMPLEMENTED / TEST PEND
 
 ## Production Activation Gate
 
-The software mining engine is verified through Stage 4A.5. Live Bitcoin mining is **not** claimed yet. Production activation still requires an actual ASIC miner, a real mining-pool account/endpoint, and a real Bitcoin wallet address to be configured through runtime configuration/secrets. Until those external dependencies are present and verified, the system remains fail-closed and does not fabricate mining activity or BTC rewards.
-
-## Official Contact Readiness
-
-- Official Proton Mail account: configured
-- Two-factor authentication: enabled
-- Official display name: Alex Bitcoin
-- Official email signature: configured and verified
-- Proton → Gmail delivery test: PASS
-- Gmail → Proton reply test: PASS
-- Gmail spam classification was corrected with “Not spam” during the test
-- No passwords, 2FA secrets, or recovery secrets are stored in the repository
-
-## Partnership Position
-
-Alex Bitcoin is seeking lawful technology and infrastructure partnerships with external mining operators/providers. The intended model is to connect verified external mining capacity through appropriate technical integrations while keeping operator-owned hardware under the operator's control. No hardware ownership, purchased hashrate, or fabricated production capacity is claimed by this project.
+The software mining engine is verified through Stage 4A.6. Live Bitcoin mining is **not** claimed yet. Production activation still requires an actual ASIC miner, a real mining-pool account/endpoint, and a real Bitcoin wallet address to be configured through runtime configuration/secrets. Until those external dependencies are present and verified, the system remains fail-closed and does not fabricate mining activity or BTC rewards.
 
 ## Final Sequence
 
 DESIGN → BUILD → TEST → INTEGRATION TEST → REGRESSION TEST → SECURITY CHECK → FINAL VERIFY → LOCK
-
 
 ## Official Project Baseline & Stop Point
 
@@ -112,14 +88,16 @@ This section is the single source of truth for the current Alex Bitcoin executio
 - Stage 4A.3 — GREEN / CLOSED
 - Stage 4A.4 — GREEN / CLOSED
 - Stage 4A.5 — GREEN / CLOSED
+- Stage 4A.6 — GREEN / CLOSED
 
 ### Current Work
 
 - Stage 4A.6 — Core Mining Work Bridge + Stratum Bridge
 - Code implemented.
-- Integration test updated to exercise Stratum subscribe → authorize → submit.
-- Final runtime verification is pending on the project's Windows environment.
-- Do not mark Stage 4A.6 GREEN / CLOSED until the real test command completes successfully.
+- Integration test exercises Stratum subscribe → authorize → submit.
+- Windows runtime verification completed successfully.
+- Stage 4A.6 is officially GREEN / CLOSED.
+- Do not reopen Stage 4A.6 unless a proven technical failure or regression is found.
 
 ### Dashboard
 
