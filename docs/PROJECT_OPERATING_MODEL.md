@@ -379,6 +379,6 @@ Section 19.9 — Stratum Difficulty Target Boundary: GREEN / CLOSED.
 Section 20 — Stratum Runtime Share-Target Binding: GREEN / CLOSED.
 Section 21 — Share Validation Boundary: GREEN / CLOSED.
 Section 22 — Operator Dashboard Runtime Integration: GREEN / CLOSED.
-Section 23 — Mining Control Boundary: IN VERIFICATION.
+Section 23 — Mining Control Boundary: GREEN / CLOSED.
 
-Current stop point: after Section 23 implementation and verification.
+Current stop point: after Section 23 — GREEN / CLOSED.
