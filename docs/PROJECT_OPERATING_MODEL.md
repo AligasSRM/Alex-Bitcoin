@@ -405,26 +405,59 @@ Boundary:
 - a concrete vendor/protocol adapter remains required before live hardware activation.
 
 Current verification status: Section 25 — GREEN / CLOSED.
-## 18. Section 26 — Alex External Control / Inspection Boundary
+## 18. Section 26 — Central Alex Control & Inspection Layer
 
-Section 26 establishes the system-facing control boundary that allows an external Alex control layer to inspect verified runtime state and invoke the already-verified mining START/STOP path.
+Section 26 establishes the central system-facing control/inspection boundary for the whole existing Alex Bitcoin system. It is not limited to START/STOP. Alex receives one typed, sanitized view that links every existing operational area while preserving each area's own safety boundary.
 
-Implemented:
-- typed `inspect`, `start_mining`, and `stop_mining` commands;
-- inspection reads the verified Core Health boundary and converts it to the existing fail-closed dashboard runtime contract;
-- command execution delegates to `ProductionMiningControl` rather than bypassing Section 23/24 safety boundaries;
-- every control command is followed by a fresh runtime inspection result;
-- explicit capability reporting shows whether START/STOP are actually exposed by the bound miner;
-- control failures remain explicit and fail closed;
-- no wallet seed/private key, credentials, or other secrets are exposed through the control result;
-- dedicated regression coverage verifies inspect, start, stop, capability reporting, and failed-control behavior.
+Linked operational areas:
+- Core and health;
+- miner / ASIC runtime;
+- pool / upstream;
+- Stratum/session;
+- jobs;
+- shares;
+- telemetry;
+- dashboard runtime;
+- wallet status;
+- profitability;
+- alerts/events;
+- lifecycle;
+- security/fail-closed state;
+- verification/regression state;
+- production-readiness state.
 
-External-control boundary:
-- this is a safe system-facing interface for an external tool/agent such as Alex;
-- it does not mean ChatGPT can directly access a user's PC or ASIC without an actual connected runtime/connector;
-- it does not invent telemetry or production state;
-- it does not bypass the production activation gate, miner adapter, pool lifecycle, Stratum lifecycle, or mining-control safety boundaries;
-- a concrete deployment transport/API and a real ASIC/pool runtime remain required for live external operation.
+Rules:
+- existing contracts remain authoritative; Section 26 does not duplicate or bypass them;
+- sections that have no verified runtime data remain unavailable rather than being fabricated;
+- sections that are observation-only remain read-only;
+- START/STOP still delegate exclusively through ProductionMiningControl;
+- every command is followed by a fresh whole-system inspection;
+- failures remain explicit and fail closed;
+- the central result includes a complete section registry so missing integration is detectable by regression tests.
+
+### Secrets boundary — isolated
+
+Secrets are deliberately outside the Alex control surface.
+
+The boundary may expose only a secret-state classification such as:
+- configured;
+- missing;
+- invalid;
+- unavailable.
+
+It must never expose:
+- passwords;
+- login credentials;
+- API secrets;
+- access tokens;
+- private keys;
+- wallet seed phrases;
+- wallet private keys;
+- other secret storage values.
+
+The regression suite serializes the central result and verifies that secret material cannot cross this boundary.
+
+Section 26 therefore provides the central "eyes and hands" integration layer, while the individual modules remain responsible for their own validation, lifecycle, security and fail-closed behavior.
 
 Current verification status: Section 26 — IN VERIFICATION.
 
