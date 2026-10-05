@@ -64,10 +64,11 @@ const core = {
   pool,
   wallet,
   profitabilityInput: {
-    electricityPricePerKwh: 0.1,
+    hashrateHps: 100_000_000_000_000,
+    powerWatts: 3000,
     btcPriceUsd: 100_000,
-    networkDifficulty: 1,
-    blockRewardBtc: 3.125,
+    btcPerHash: 1e-20,
+    electricityUsdPerKwh: 0.1,
   },
 };
 
@@ -101,17 +102,16 @@ if (!stopped.ok || stopped.command !== "stop_mining" || stopped.snapshot.state =
 }
 if (minerConnected || poolConnected || mining) throw new Error("Alex control stop did not disconnect the runtime");
 
+const blockedMiner = {
+  ...miner,
+  async startMining() { throw new Error("start unavailable"); },
+  async getTelemetry() { throw new Error("telemetry unavailable"); },
+};
+
 const blocked = new AlexControlBoundary({
-  core: {
-    ...core,
-    miner: {
-      ...miner,
-      async startMining() { throw new Error("should not be reached"); },
-      async getTelemetry() { throw new Error("telemetry unavailable"); },
-    },
-  },
+  core: { ...core, miner: blockedMiner as typeof miner },
   productionControl: new ProductionMiningControl({
-    miner: { ...miner, async startMining() { throw new Error("start unavailable"); } },
+    miner: blockedMiner,
     pool,
     wallet,
   }),
