@@ -404,7 +404,7 @@ Boundary:
 - it does not claim a vendor-specific ASIC protocol, IP address, credentials, live hashrate, pool session, or accepted shares;
 - a concrete vendor/protocol adapter remains required before live hardware activation.
 
-Current verification status: Section 25 — IN VERIFICATION.
+Current verification status: Section 25 — GREEN / CLOSED.
 ## 18. Current locked position
 
 Section 19.1 — Stratum Session + Job Lifecycle Boundary: GREEN / CLOSED.
@@ -422,5 +422,5 @@ Section 22 — Operator Dashboard Runtime Integration: GREEN / CLOSED.
 Section 23 — Mining Control Boundary: GREEN / CLOSED.
 Section 24 — Production Mining Control Runtime Binding: GREEN / CLOSED.
 
-Current locked stop point: Section 24 — GREEN / CLOSED.
-Next engineering section: 25 — ASIC Miner Runtime Adapter Boundary
+Current locked stop point: Section 25 — GREEN / CLOSED.
+Next engineering section: 26
