@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 21 GREEN / CLOSED
-Next engineering section: 22
+Current locked stop point: Section 22 GREEN / CLOSED
+Next engineering section: 23
 
 ## 1. What this system is
 
@@ -357,7 +357,7 @@ Section 19.8 — Stratum Difficulty Lifecycle Boundary: GREEN / CLOSED.
 Section 19.9 — Stratum Difficulty Target Boundary: GREEN / CLOSED.
 Section 20 — Stratum Runtime Share-Target Binding: GREEN / CLOSED.
 
-Current stop point: after Section 21.
-Next planned work: Section 22.
+Current stop point: after Section 22.
+Next planned work: Section 23.
 
 This document is the canonical reference for the operating model, modification/verification method, and the deferred control-dashboard architecture. It does not replace the source code, tests, CI evidence, or individual section records.
