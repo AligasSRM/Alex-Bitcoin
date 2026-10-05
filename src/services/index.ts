@@ -7,3 +7,4 @@ export * from "./retry";
 export * from "./health-poll";
 export * from "./readiness";
 export * from "./runtime-status";
+export * from "./alex-control";
