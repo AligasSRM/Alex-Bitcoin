@@ -444,6 +444,8 @@ Section 21 — Share Validation Boundary: GREEN / CLOSED.
 Section 22 — Operator Dashboard Runtime Integration: GREEN / CLOSED.
 Section 23 — Mining Control Boundary: GREEN / CLOSED.
 Section 24 — Production Mining Control Runtime Binding: GREEN / CLOSED.
+Section 25 — ASIC Miner Runtime Adapter Boundary: GREEN / CLOSED.
+Section 26 — Alex External Control / Inspection Boundary: IN VERIFICATION.
 
 Current locked stop point: Section 25 — GREEN / CLOSED.
 Active engineering section: 26 — Alex External Control / Inspection Boundary.
