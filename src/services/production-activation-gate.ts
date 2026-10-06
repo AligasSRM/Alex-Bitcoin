@@ -1,3 +1,5 @@
+import { validateRealMiningEvidence, type RealMiningEvidenceRecord } from "./real-mining-evidence";
+
 export interface ProductionActivationInput {
   env: "development" | "test" | "production";
   minerConfigured: boolean;
@@ -6,33 +8,13 @@ export interface ProductionActivationInput {
   poolConnected: boolean;
   walletConfigured: boolean;
   walletReachable: boolean;
-  realMiningEvidence?: RealMiningEvidence;
-}
-
-export interface RealMiningEvidence {
-  asicIdentityVerified: boolean;
-  stratumSubscribed: boolean;
-  stratumAuthorized: boolean;
-  realJobReceived: boolean;
-  realShareSubmitted: boolean;
-  poolAcceptedShare: boolean;
-  telemetryVerified: boolean;
+  realMiningEvidence?: RealMiningEvidenceRecord;
 }
 
 export interface ProductionActivationResult {
   enabled: boolean;
   reasons: string[];
 }
-
-const REQUIRED_REAL_EVIDENCE: Array<keyof RealMiningEvidence> = [
-  "asicIdentityVerified",
-  "stratumSubscribed",
-  "stratumAuthorized",
-  "realJobReceived",
-  "realShareSubmitted",
-  "poolAcceptedShare",
-  "telemetryVerified",
-];
 
 export function evaluateProductionActivation(
   input: ProductionActivationInput,
@@ -47,13 +29,10 @@ export function evaluateProductionActivation(
   if (!input.walletConfigured) reasons.push("wallet_configuration_missing");
   if (!input.walletReachable) reasons.push("wallet_not_reachable");
 
-  const evidence = input.realMiningEvidence;
-  if (!evidence) {
+  if (!input.realMiningEvidence) {
     reasons.push("real_mining_evidence_missing");
   } else {
-    for (const key of REQUIRED_REAL_EVIDENCE) {
-      if (!evidence[key]) reasons.push(`real_mining_evidence_${key}_missing`);
-    }
+    reasons.push(...validateRealMiningEvidence(input.realMiningEvidence));
   }
 
   return { enabled: reasons.length === 0, reasons };
