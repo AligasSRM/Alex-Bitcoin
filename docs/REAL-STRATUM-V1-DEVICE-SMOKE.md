@@ -20,8 +20,6 @@ Stratum V1 uses newline-delimited JSON-RPC-style messages and the normal flow in
 - `STRATUM_PORT` — pool TCP port
 - `STRATUM_WORKER` — worker identity in the exact format required by the selected pool
 - `STRATUM_PASSWORD` — pool worker password; defaults to `x` when the pool does not require one
-- `BTC_ADDRESS` — public BTC receiving address used for pool/account configuration when required
-
 Optional:
 
 - `MAX_HASHES_PER_JOB` — bounded CPU scan, default 100000
@@ -46,7 +44,6 @@ export STRATUM_HOST='POOL_HOST'
 export STRATUM_PORT='POOL_PORT'
 export STRATUM_WORKER='POOL_SPECIFIC_WORKER_ID'
 export STRATUM_PASSWORD='POOL_PASSWORD'
-export BTC_ADDRESS='YOUR_PUBLIC_BTC_RECEIVING_ADDRESS'
 npm run real:stratum-smoke
 ```
 
@@ -57,8 +54,11 @@ $env:STRATUM_HOST='POOL_HOST'
 $env:STRATUM_PORT='POOL_PORT'
 $env:STRATUM_WORKER='POOL_SPECIFIC_WORKER_ID'
 $env:STRATUM_PASSWORD='POOL_PASSWORD'
-$env:BTC_ADDRESS='YOUR_PUBLIC_BTC_RECEIVING_ADDRESS'
 npm run real:stratum-smoke
 ```
 
 Do not substitute a worker format until the selected pool's current instructions are checked.
+
+## Evidence output
+
+The runner writes a local JSON evidence record to `.runtime/real-stratum-smoke-evidence.json` by default. Set `REAL_MINING_EVIDENCE_PATH` to override the path. The record is explicitly marked `source: "cpu-smoke"` and therefore **cannot** satisfy ASIC identity or production activation. A future ASIC runner must emit the same evidence shape with `source: "asic"` and all seven observations verified.
