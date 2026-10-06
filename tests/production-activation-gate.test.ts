@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
-import { evaluateProductionActivation, type RealMiningEvidence } from "../src/services/production-activation-gate";
+import { evaluateProductionActivation } from "../src/services/production-activation-gate";
+import type { RealMiningEvidenceRecord } from "../src/services/real-mining-evidence";
 
-const evidence: RealMiningEvidence = {
+const evidence: RealMiningEvidenceRecord = {
+  source: "asic",
+  observedAt: "2026-10-06T20:00:00.000Z",
   asicIdentityVerified: true,
   stratumSubscribed: true,
   stratumAuthorized: true,
