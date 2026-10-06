@@ -26,3 +26,37 @@ export function miningWorkFromBitcoinCoreTemplate(
     createdAt,
   };
 }
+
+import type { StratumMiningBridge } from "../pool/bridge";
+
+export class BitcoinCoreStratumWorkBridge {
+  private activeJobId?: string;
+
+  constructor(
+    private readonly bitcoinCore: { getBlockTemplate(): Promise<BitcoinCoreMiningTemplate> },
+    private readonly stratum: StratumMiningBridge,
+  ) {}
+
+  async refreshWork(createdAt?: string): Promise<MiningWork> {
+    const template = await this.bitcoinCore.getBlockTemplate();
+    const work = miningWorkFromBitcoinCoreTemplate(template, createdAt);
+
+    if (this.activeJobId && this.activeJobId !== work.jobId) {
+      this.stratum.retireJob(this.activeJobId);
+    }
+
+    this.stratum.registerJob(work);
+    this.activeJobId = work.jobId;
+    return work;
+  }
+
+  retire(): void {
+    if (!this.activeJobId) return;
+    this.stratum.retireJob(this.activeJobId);
+    this.activeJobId = undefined;
+  }
+
+  getActiveJobId(): string | undefined {
+    return this.activeJobId;
+  }
+}

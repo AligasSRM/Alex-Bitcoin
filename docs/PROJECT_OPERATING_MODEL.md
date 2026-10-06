@@ -1,8 +1,8 @@
 # Alex Bitcoin — Canonical Operating Model
 
 Status: ACTIVE / REFERENCE
-Current locked stop point: Section 21 GREEN / CLOSED
-Next engineering section: 22
+Current locked stop point: Section 25 GREEN / CLOSED
+Next engineering section: 26
 
 ## 1. What this system is
 
@@ -318,7 +318,150 @@ The planned dashboard model is informed by established mining-monitoring pattern
 
 The dashboard work starts only after the core mining system has been completed and the relevant engineering sections are GREEN/CLOSED. The dashboard is therefore a later phase, not part of the current 19.9 work unless explicitly re-planned.
 
-## 13. Current locked position
+## 13. Section 22 — Operator Dashboard Runtime Integration
+
+Section 22 formalizes the operator dashboard phase already implemented in the repository after Section 21.
+
+Scope verified in the repository:
+- mobile-first operator dashboard structure
+- fail-closed typed runtime snapshot contract
+- browser runtime binding through `window.AlexBitcoinRuntime` and `alexbitcoin:runtime`
+- verified core-health → dashboard runtime mapping
+- operator telemetry panels for hashrate, temperature, power, efficiency, shares, pool/Stratum/job/wallet, ASIC/network telemetry, live events, and verified financial fields
+- unavailable or unverified production values remain `N/A` / `NOT CONNECTED`
+- dashboard does not fabricate telemetry, profitability, mining state, or production control actions
+- dashboard control buttons remain disabled until a real production control boundary exists
+
+Verification evidence:
+- dashboard runtime contract regression test is included in the repository test chain
+- core-to-dashboard mapper has dedicated regression coverage
+- fail-closed browser runtime publisher and loading order are implemented
+- latest `main` CI run for commit `ae56b438405bc59fe95171effa2f45cde353f7da` completed successfully
+- the dashboard work predates the current locked main baseline and is unchanged by the subsequent Stage 4A.6 verification commits
+
+Section 22 boundary:
+- dashboard presentation and runtime observation are GREEN/CLOSED
+- real ASIC control, real pool activation, real mining start/stop execution, and production financial activation remain outside this section
+- those capabilities require their own verified runtime/control/external-dependency boundaries and must not be implied by the dashboard UI.
+
+
+## 14. Section 23 — Mining Control Boundary
+
+Section 23 establishes the fail-closed control boundary for real mining START/STOP commands.
+
+Implemented:
+- typed mining control state machine: stopped / starting / mining / stopping / error
+- explicit START boundary that requires a miner adapter start capability
+- explicit STOP boundary that requires a miner adapter stop capability
+- duplicate START rejection while starting/mining
+- duplicate STOP rejection while stopped
+- failed or unavailable control paths never report successful mining
+- control failures transition to an explicit error state
+- dedicated regression coverage included in the repository test chain
+
+Section 23 boundary:
+- this is the control contract and safety boundary only
+- it does not claim that a physical ASIC is connected
+- it does not claim a live pool session or real Bitcoin mining
+- production activation remains gated by the existing production activation boundary and real external dependencies
+
+## 15. Section 24 — Production Mining Control Runtime Binding
+
+Section 24 binds the Section 23 mining START/STOP control boundary to the existing external adapter lifecycle.
+
+Implemented:
+- production control starts through the existing external adapter lifecycle
+- miner and pool connections are established before mining START
+- wallet status is validated as part of the existing lifecycle gate
+- the real miner control boundary is invoked only after the external lifecycle succeeds
+- failed mining START is rolled back through the external lifecycle
+- successful STOP stops the mining control first, then disconnects the external runtime
+- successful STOP leaves the control state stopped and the external lifecycle disconnected
+- dedicated regression coverage verifies start, stop, and failed-start rollback
+
+Section 24 boundary:
+- this is the runtime orchestration binding between the control contract and external adapters
+- it does not claim a physical ASIC is connected
+- it does not claim a live pool account/session or accepted production shares
+- it does not claim production BTC rewards, settlement, or financial activation
+- production activation remains gated by real external infrastructure and verified deployment/runtime configuration
+
+
+## 17. Section 25 — ASIC Miner Runtime Adapter Boundary
+
+Section 25 defines the verified software contract for a real ASIC miner runtime without pretending that a physical ASIC is connected.
+
+Scope:
+- explicit ASIC runtime identity and endpoint boundary;
+- required connect/disconnect lifecycle inherited from MinerAdapter;
+- required START/STOP mining controls;
+- validated telemetry contract remains the source of miner observations;
+- fail-closed validation when the ASIC control boundary or endpoint is incomplete;
+- dedicated regression coverage for the ASIC runtime contract.
+
+Boundary:
+- Section 25 does not claim a physical ASIC is connected;
+- it does not claim a vendor-specific ASIC protocol, IP address, credentials, live hashrate, pool session, or accepted shares;
+- a concrete vendor/protocol adapter remains required before live hardware activation.
+
+Current verification status: Section 25 — GREEN / CLOSED.
+## 18. Section 26 — Central Alex Control & Inspection Layer
+
+Section 26 establishes the central system-facing control/inspection boundary for the whole existing Alex Bitcoin system. It is not limited to START/STOP. Alex receives one typed, sanitized view that links every existing operational area while preserving each area's own safety boundary.
+
+Linked operational areas:
+- Core and health;
+- miner / ASIC runtime;
+- pool / upstream;
+- Stratum/session;
+- jobs;
+- shares;
+- telemetry;
+- dashboard runtime;
+- wallet status;
+- profitability;
+- alerts/events;
+- lifecycle;
+- security/fail-closed state;
+- verification/regression state;
+- production-readiness state.
+
+Rules:
+- existing contracts remain authoritative; Section 26 does not duplicate or bypass them;
+- sections that have no verified runtime data remain unavailable rather than being fabricated;
+- sections that are observation-only remain read-only;
+- START/STOP still delegate exclusively through ProductionMiningControl;
+- every command is followed by a fresh whole-system inspection;
+- failures remain explicit and fail closed;
+- the central result includes a complete section registry so missing integration is detectable by regression tests.
+
+### Secrets boundary — isolated
+
+Secrets are deliberately outside the Alex control surface.
+
+The boundary may expose only a secret-state classification such as:
+- configured;
+- missing;
+- invalid;
+- unavailable.
+
+It must never expose:
+- passwords;
+- login credentials;
+- API secrets;
+- access tokens;
+- private keys;
+- wallet seed phrases;
+- wallet private keys;
+- other secret storage values.
+
+The regression suite serializes the central result and verifies that secret material cannot cross this boundary.
+
+Section 26 therefore provides the central "eyes and hands" integration layer, while the individual modules remain responsible for their own validation, lifecycle, security and fail-closed behavior.
+
+Current verification status: Section 26 — GREEN / CLOSED.
+
+## 18. Current locked position
 
 Section 19.1 — Stratum Session + Job Lifecycle Boundary: GREEN / CLOSED.
 Section 19.2 — Upstream Session Lifecycle: GREEN / CLOSED.
@@ -330,8 +473,12 @@ Section 19.7 — Stratum Difficulty State Boundary: GREEN / CLOSED.
 Section 19.8 — Stratum Difficulty Lifecycle Boundary: GREEN / CLOSED.
 Section 19.9 — Stratum Difficulty Target Boundary: GREEN / CLOSED.
 Section 20 — Stratum Runtime Share-Target Binding: GREEN / CLOSED.
+Section 21 — Share Validation Boundary: GREEN / CLOSED.
+Section 22 — Operator Dashboard Runtime Integration: GREEN / CLOSED.
+Section 23 — Mining Control Boundary: GREEN / CLOSED.
+Section 24 — Production Mining Control Runtime Binding: GREEN / CLOSED.
+Section 25 — ASIC Miner Runtime Adapter Boundary: GREEN / CLOSED.
+Section 26 — Alex External Control / Inspection Boundary: GREEN / CLOSED.
 
-Current stop point: after Section 21.
-Next planned work: Section 22.
-
-This document is the canonical reference for the operating model, modification/verification method, and the deferred control-dashboard architecture. It does not replace the source code, tests, CI evidence, or individual section records.
+Current locked stop point: Section 26 — GREEN / CLOSED.
+Active engineering section: None — Section 26 is locked.
