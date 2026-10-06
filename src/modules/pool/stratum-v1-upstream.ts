@@ -5,13 +5,13 @@ import type { UpstreamJobSource, UpstreamState } from "./upstream";
 export interface StratumV1Job {
   jobId: string;
   prevHash: string;
- coinbase1: string;
+  coinbase1: string;
   coinbase2: string;
- merkleBranches: string[];
- version: string;
- nbits: string;
- ntime: string;
- cleanJobs: boolean;
+  merkleBranches: string[];
+  version: string;
+  nbits: string;
+  ntime: string;
+  cleanJobs: boolean;
 }
 
 export interface StratumV1UpstreamOptions {
@@ -26,23 +26,35 @@ export interface StratumV1UpstreamOptions {
 }
 
 export class StratumV1UpstreamClient implements UpstreamJobSource {
-  private readonly options: Required<Omit<StratumV1UpstreamOptions, "socketFactory" | "jobToMiningWork">> & Pick<StratumV1UpstreamOptions, "socketFactory" | "jobToMiningWork">;
+  private readonly options: Required<Omit<StratumV1UpstreamOptions, "socketFactory" | "jobToMiningWork">> &
+    Pick<StratumV1UpstreamOptions, "socketFactory" | "jobToMiningWork">;
   private socket?: Socket;
   private state: UpstreamState = "disconnected";
   private nextId = 1;
   private buffer = "";
   private extranonce1?: string;
   private negotiatedExtranonce2Size?: number;
-  private shareTargetHex = "00000000ffff0000000000000000000000000000000000000000000000000000";
+  private shareTargetHex = "00000000ffff0000000000000000000000000000000000000000000000";
   private jobHandler?: (work: MiningWork) => void;
-  private readonly pending = new Map<number, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: NodeJS.Timeout }>();
+  private readonly pending = new Map<
+    number,
+    { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: NodeJS.Timeout }
+  >();
 
   constructor(options: StratumV1UpstreamOptions) {
     if (!options.host.trim()) throw new Error("host is required");
     if (!Number.isInteger(options.port) || options.port < 1 || options.port > 65535) throw new Error("invalid port");
     if (!options.workerName.trim()) throw new Error("workerName is required");
-    if (!Number.isInteger(options.extranonce2Size ?? 4) || (options.extranonce2Size ?? 4) < 1 || (options.extranonce2Size ?? 4) > 16) throw new Error("invalid extranonce2Size");
-    if (!Number.isFinite(options.timeoutMs ?? 10000) || (options.timeoutMs ?? 10000) <= 0) throw new Error("invalid timeoutMs");
+    if (
+      !Number.isInteger(options.extranonce2Size ?? 4) ||
+      (options.extranonce2Size ?? 4) < 1 ||
+      (options.extranonce2Size ?? 4) > 16
+    ) {
+      throw new Error("invalid extranonce2Size");
+    }
+    if (!Number.isFinite(options.timeoutMs ?? 10000) || (options.timeoutMs ?? 10000) <= 0) {
+      throw new Error("invalid timeoutMs");
+    }
     this.options = {
       ...options,
       extranonce2Size: options.extranonce2Size ?? 4,
@@ -53,7 +65,9 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
   async connect(): Promise<void> {
     if (this.state === "connected") return;
     this.state = "connecting";
-    const socket = this.options.socketFactory?.(this.options.port, this.options.host) ?? createConnection({ port: this.options.port, host: this.options.host });
+    const socket =
+      this.options.socketFactory?.(this.options.port, this.options.host) ??
+      createConnection({ port: this.options.port, host: this.options.host });
     this.socket = socket;
     this.buffer = "";
 
@@ -85,10 +99,15 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
     try {
       const subscribed = await this.rpc("mining.subscribe", []);
       const result = subscribed as unknown[];
-      if (!Array.isArray(result) || typeof result[1] !== "string" || typeof result[2] !== "number") throw new Error("invalid mining.subscribe response");
-      if (!Number.isInteger(result[2]) || result[2] < 1 || result[2] > 16) throw new Error("invalid negotiated extranonce2_size");
+      if (!Array.isArray(result) || typeof result[1] !== "string" || typeof result[2] !== "number") {
+        throw new Error("invalid mining.subscribe response");
+      }
+      if (!Number.isInteger(result[2]) || result[2] < 1 || result[2] > 16) {
+        throw new Error("invalid negotiated extranonce2_size");
+      }
       this.extranonce1 = result[1];
       this.negotiatedExtranonce2Size = result[2];
+
       const authorize = await this.rpc("mining.authorize", [this.options.workerName, this.options.password]);
       if (authorize !== true) throw new Error("mining.authorize rejected");
       this.state = "connected";
@@ -128,10 +147,24 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
     };
   }
 
-  async submitShare(request: { workerId: string; jobId: string; extranonce2: string; ntime: string; nonce: string }): Promise<boolean> {
+  async submitShare(request: {
+    workerId: string;
+    jobId: string;
+    extranonce2: string;
+    ntime: string;
+    nonce: string;
+  }): Promise<boolean> {
     if (this.state !== "connected") return false;
-    if (!/^[0-9a-fA-F]+$/.test(request.extranonce2) || request.extranonce2.length !== this.getExtranonce2Size() * 2) return false;
-    const result = await this.rpc("mining.submit", [request.workerId, request.jobId, request.extranonce2, request.ntime, request.nonce]);
+    if (!/^[0-9a-fA-F]+$/.test(request.extranonce2) || request.extranonce2.length !== this.getExtranonce2Size() * 2) {
+      return false;
+    }
+    const result = await this.rpc("mining.submit", [
+      request.workerId,
+      request.jobId,
+      request.extranonce2,
+      request.ntime,
+      request.nonce,
+    ]);
     return result === true;
   }
 
@@ -168,14 +201,20 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
 
   private onLine(line: string): void {
     let message: unknown;
-    try { message = JSON.parse(line); } catch { this.state = "degraded"; return; }
+    try {
+      message = JSON.parse(line);
+    } catch {
+      this.state = "degraded";
+      return;
+    }
     if (!message || typeof message !== "object") return;
     const value = message as Record<string, unknown>;
 
     if (value.method === "mining.set_difficulty" && Array.isArray(value.params) && typeof value.params[0] === "number") {
       const difficulty = value.params[0];
       if (Number.isFinite(difficulty) && difficulty > 0) {
-        const scaled = 0x00000000ffff0000000000000000000000000000000000000000000000000000n * 1000000000000000000n;
+        const scaled =
+          0x00000000ffff0000000000000000000000000000000000000000000000000000n * 1000000000000000000n;
         const divisor = BigInt(Math.round(difficulty * 1000000000000000000));
         if (divisor > 0n) this.shareTargetHex = (scaled / divisor).toString(16).padStart(64, "0");
       } else {
@@ -198,19 +237,26 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
     }
 
     if (value.method !== "mining.notify" || !Array.isArray(value.params) || value.params.length < 9) return;
+
     const p = value.params;
-    if (!this.extranonce1 || p.some((v) => typeof v !== "string")) return;
+    const fixedFields = [p[0], p[1], p[2], p[3], p[5], p[6], p[7]];
+    if (fixedFields.some((v) => typeof v !== "string")) return;
+    if (!Array.isArray(p[4]) || p[4].some((v) => typeof v !== "string")) return;
+    if (typeof p[8] !== "boolean") return;
+    if (!this.extranonce1) return;
+
     const job: StratumV1Job = {
       jobId: p[0] as string,
       prevHash: p[1] as string,
       coinbase1: p[2] as string,
       coinbase2: p[3] as string,
-      merkleBranches: p[4] as unknown[] as string[],
+      merkleBranches: p[4] as string[],
       version: p[5] as string,
       nbits: p[6] as string,
       ntime: p[7] as string,
-      cleanJobs: p[8] === true,
+      cleanJobs: p[8] as boolean,
     };
+
     try {
       const work = this.options.jobToMiningWork(job, this.extranonce1, this.getExtranonce2Size(), this.shareTargetHex);
       this.jobHandler?.(work);
