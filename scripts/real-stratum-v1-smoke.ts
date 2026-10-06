@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 import { stratumJobToMiningWork } from "../src/modules/pool/stratum-v1-job";
 import { StratumV1UpstreamClient, type StratumV1Job } from "../src/modules/pool/stratum-v1-upstream";
 import { searchMiningWork } from "../src/modules/mining/search";
@@ -25,13 +27,11 @@ function validateBtcAddress(value: string): void {
 
 const host = required("STRATUM_HOST");
 const port = positiveInt("STRATUM_PORT", 3333);
-const btcAddress = required("BTC_ADDRESS");
 const workerName = required("STRATUM_WORKER");
 const password = process.env.STRATUM_PASSWORD ?? "x";
 const maxHashes = positiveInt("MAX_HASHES_PER_JOB", 100_000);
 const maxJobs = positiveInt("MAX_JOBS", 1);
 const timeoutMs = positiveInt("STRATUM_TIMEOUT_MS", 15_000);
-validateBtcAddress(btcAddress);
 
 let jobCount = 0;
 let submitted = 0;
@@ -40,6 +40,7 @@ let rejected = 0;
 let totalHashes = 0;
 let activeExtranonce2 = "";
 let activeJob: StratumV1Job | undefined;
+let finished = false;
 
 function makeExtranonce2(size: number): string {
   const bytes = Buffer.alloc(size);
@@ -74,7 +75,6 @@ console.log(JSON.stringify({
   host,
   port,
   worker: workerName,
-  btcAddress,
   maxHashesPerJob: maxHashes,
   maxJobs,
 }, null, 2));
@@ -125,8 +125,31 @@ const unsubscribe = client.onJob((work) => {
 });
 
 async function finish(): Promise<void> {
+  if (finished) return;
+  finished = true;
   unsubscribe();
   await client.disconnect();
+  const evidence = {
+    source: "cpu-smoke" as const,
+    observedAt: new Date().toISOString(),
+    asicIdentityVerified: false,
+    stratumSubscribed: true,
+    stratumAuthorized: true,
+    realJobReceived: jobCount > 0,
+    realShareSubmitted: submitted > 0,
+    poolAcceptedShare: accepted > 0,
+    telemetryVerified: false,
+    poolHost: host,
+    poolPort: port,
+    workerId: workerName,
+    jobId: activeJob?.jobId,
+    hashesTried: totalHashes,
+  };
+
+  const evidencePath = process.env.REAL_MINING_EVIDENCE_PATH?.trim() || ".runtime/real-stratum-smoke-evidence.json";
+  await mkdir(dirname(evidencePath), { recursive: true });
+  await writeFile(evidencePath, JSON.stringify(evidence, null, 2) + "\n", "utf8");
+
   console.log(JSON.stringify({
     event: "real-stratum-smoke-finished",
     connected: true,
@@ -138,6 +161,7 @@ async function finish(): Promise<void> {
     sharesRejected: rejected,
     hashesTried: totalHashes,
     realPoolAcceptedShare: accepted > 0,
+    evidencePath,
     note: accepted > 0
       ? "Real pool acceptance observed."
       : "No accepted share observed in the bounded scan; this is not activation evidence.",
