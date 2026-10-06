@@ -36,6 +36,7 @@ requestQueue.push(socket.lastWrite);
 socket.emit("data", '{"id":2,"result":true,"error":null}\n');
 await connectPromise;
 assert.equal(client.getState(), "connected");
+assert.equal(client.getExtranonce2Size(), 4);
 
 let received = false;
 client.onJob(() => { received = true; });
