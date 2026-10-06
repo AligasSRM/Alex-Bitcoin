@@ -34,7 +34,7 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
   private buffer = "";
   private extranonce1?: string;
   private negotiatedExtranonce2Size?: number;
-  private shareTargetHex = "00000000ffff0000000000000000000000000000000000000000000000";
+  private shareTargetHex = "00000000ffff0000000000000000000000000000000000000000000000000000";
   private jobHandler?: (work: MiningWork) => void;
   private readonly pending = new Map<
     number,
