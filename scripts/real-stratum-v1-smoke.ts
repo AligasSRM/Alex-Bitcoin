@@ -18,13 +18,6 @@ function positiveInt(name: string, fallback: number): number {
   return value;
 }
 
-function validateBtcAddress(value: string): void {
-  // Syntax guard only. Address ownership and network validity remain the user's responsibility.
-  if (value.length < 26 || value.length > 90 || !/^[13bcBC][A-Za-z0-9]+$/.test(value)) {
-    throw new Error("BTC_ADDRESS has an invalid Bitcoin-address-like format");
-  }
-}
-
 const host = required("STRATUM_HOST");
 const port = positiveInt("STRATUM_PORT", 3333);
 const workerName = required("STRATUM_WORKER");
