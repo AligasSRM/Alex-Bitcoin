@@ -32,6 +32,7 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
   private nextId = 1;
   private buffer = "";
   private extranonce1?: string;
+  private negotiatedExtranonce2Size?: number;
   private shareTargetHex = "00000000ffff0000000000000000000000000000000000000000000000000000";
   private jobHandler?: (work: MiningWork) => void;
   private readonly pending = new Map<number, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: NodeJS.Timeout }>();
@@ -85,7 +86,9 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
       const subscribed = await this.rpc("mining.subscribe", []);
       const result = subscribed as unknown[];
       if (!Array.isArray(result) || typeof result[1] !== "string" || typeof result[2] !== "number") throw new Error("invalid mining.subscribe response");
+      if (!Number.isInteger(result[2]) || result[2] < 1 || result[2] > 16) throw new Error("invalid negotiated extranonce2_size");
       this.extranonce1 = result[1];
+      this.negotiatedExtranonce2Size = result[2];
       const authorize = await this.rpc("mining.authorize", [this.options.workerName, this.options.password]);
       if (authorize !== true) throw new Error("mining.authorize rejected");
       this.state = "connected";
@@ -101,6 +104,7 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
     const socket = this.socket;
     this.socket = undefined;
     this.extranonce1 = undefined;
+    this.negotiatedExtranonce2Size = undefined;
     this.buffer = "";
     if (socket && !socket.destroyed) socket.destroy();
   }
@@ -113,6 +117,10 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
     return this.shareTargetHex;
   }
 
+  getExtranonce2Size(): number {
+    return this.negotiatedExtranonce2Size ?? this.options.extranonce2Size;
+  }
+
   onJob(handler: (work: MiningWork) => void): () => void {
     this.jobHandler = handler;
     return () => {
@@ -122,6 +130,7 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
 
   async submitShare(request: { workerId: string; jobId: string; extranonce2: string; ntime: string; nonce: string }): Promise<boolean> {
     if (this.state !== "connected") return false;
+    if (!/^[0-9a-fA-F]+$/.test(request.extranonce2) || request.extranonce2.length !== this.getExtranonce2Size() * 2) return false;
     const result = await this.rpc("mining.submit", [request.workerId, request.jobId, request.extranonce2, request.ntime, request.nonce]);
     return result === true;
   }
@@ -203,7 +212,7 @@ export class StratumV1UpstreamClient implements UpstreamJobSource {
       cleanJobs: p[8] === true,
     };
     try {
-      const work = this.options.jobToMiningWork(job, this.extranonce1, this.options.extranonce2Size, this.shareTargetHex);
+      const work = this.options.jobToMiningWork(job, this.extranonce1, this.getExtranonce2Size(), this.shareTargetHex);
       this.jobHandler?.(work);
     } catch {
       this.state = "degraded";
