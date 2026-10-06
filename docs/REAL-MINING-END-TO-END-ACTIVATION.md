@@ -23,3 +23,9 @@ Unit tests may verify the gate logic, but they do **not** satisfy these evidence
 - No synthetic fixtures, mocked pool responses, or telemetry-only claims may be used as real activation evidence.
 
 Until REAL ACTIVATION GREEN, the system must remain fail-closed for production mining.
+
+## Evidence boundary
+
+All activation evidence is validated through `src/services/real-mining-evidence.ts` before the production gate can enable mining. The evidence source must be `asic`; the CPU Stratum smoke runner intentionally emits `cpu-smoke` and can never satisfy REAL ACTIVATION GREEN. Runtime evidence is written locally and is ignored by Git so pool credentials and operational evidence are not committed.
+
+This closes the software-side evidence boundary. REAL ACTIVATION GREEN remains blocked until an actual ASIC session supplies all seven observations and pool-side telemetry.
