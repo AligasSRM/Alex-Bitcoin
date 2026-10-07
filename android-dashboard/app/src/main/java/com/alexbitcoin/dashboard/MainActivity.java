@@ -20,6 +20,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         webView = new WebView(this);
         setContentView(webView);
+        webView.setVisibility(WebView.INVISIBLE);
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -31,7 +32,17 @@ public class MainActivity extends Activity {
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
+            public void onPageFinished(WebView view, String url) {
+                webView.setVisibility(WebView.VISIBLE);
+            }
+
+            @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                if (request.isForMainFrame()) showError();
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, android.webkit.WebResourceResponse errorResponse) {
                 if (request.isForMainFrame()) showError();
             }
         });
@@ -40,6 +51,7 @@ public class MainActivity extends Activity {
     }
 
     private void showError() {
+        if (webView != null) webView.setVisibility(WebView.VISIBLE);
         TextView error = new TextView(this);
         error.setText("Alex Bitcoin\n\nتعذر فتح لوحة التحكم. تحقق من اتصال الإنترنت وحاول مرة ثانية.");
         error.setTextSize(18);
