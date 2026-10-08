@@ -9,9 +9,11 @@
     "real:stratum-smoke": "tsx scripts/real-stratum-v1-smoke.ts",
     "start:core": "tsx src/runtime-http-server.ts"
   },
+  "dependencies": {
+    "tsx": "^4.19.2"
+  },
   "devDependencies": {
     "@types/node": "^22.10.0",
-    "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },
   "type": "module"
