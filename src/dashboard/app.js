@@ -62,6 +62,19 @@
     renderEvents(runtime.events);
   };
 
+  const bridge = window.AlexBitcoinRuntimeBridge;
+  const setControls = (busy) => document.querySelectorAll("[data-mining-action]").forEach((button) => { button.disabled = busy; });
+  document.querySelectorAll("[data-mining-action]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const action = button.dataset.miningAction;
+      if (!bridge || !action) return;
+      setControls(true);
+      try { await bridge.control(action); } catch (error) {
+        window.dispatchEvent(new CustomEvent("alexbitcoin:runtime-error", {detail:String(error?.message || error)}));
+      } finally { setControls(false); }
+    });
+  });
   window.addEventListener("alexbitcoin:runtime", render);
+  window.addEventListener("alexbitcoin:runtime-error", render);
   render();
 })();
