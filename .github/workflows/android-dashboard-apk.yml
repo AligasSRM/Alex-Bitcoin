@@ -2,6 +2,9 @@ name: Build Alex Bitcoin Dashboard APK
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - stage-dashboard-android-apk
 
 jobs:
   build-apk:
