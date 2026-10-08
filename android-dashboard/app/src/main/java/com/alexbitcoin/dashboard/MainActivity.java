@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.webkit.RenderProcessGoneDetail;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -36,7 +35,7 @@ public class MainActivity extends Activity {
         root.setBackgroundColor(Color.rgb(5, 7, 10));
 
         errorView = new TextView(this);
-        errorView.setText("Alex Bitcoin\n\nجارِ فتح لوحة التحكم...");
+        errorView.setText("Alex Bitcoin\\n\\nجارِ فتح لوحة التحكم...");
         errorView.setTextColor(Color.WHITE);
         errorView.setTextSize(18);
         errorView.setGravity(Gravity.CENTER);
@@ -64,7 +63,7 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
-                errorView.setText("Alex Bitcoin\n\nجارِ فتح لوحة التحكم...");
+                errorView.setText("Alex Bitcoin\\n\\nجارِ فتح لوحة التحكم...");
                 errorView.setVisibility(View.VISIBLE);
             }
 
@@ -83,9 +82,7 @@ public class MainActivity extends Activity {
                                             android.webkit.WebResourceResponse response) {
                 if (request.isForMainFrame()) showError("الخادم أعاد خطأ HTTP. اضغط إعادة المحاولة.");
             }
-        });
 
-        webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
                 replaceCrashedWebView();
@@ -102,7 +99,7 @@ public class MainActivity extends Activity {
     }
 
     private void loadDashboard() {
-        errorView.setText("Alex Bitcoin\n\nجارِ فتح لوحة التحكم...");
+        errorView.setText("Alex Bitcoin\\n\\nجارِ فتح لوحة التحكم...");
         errorView.setVisibility(View.VISIBLE);
         try {
             webView.loadUrl(DASHBOARD_URL);
@@ -113,7 +110,7 @@ public class MainActivity extends Activity {
 
     private void showError(String message) {
         if (errorView != null) {
-            errorView.setText("Alex Bitcoin\n\n" + message + "\n\nإعادة المحاولة");
+            errorView.setText("Alex Bitcoin\\n\\n" + message + "\\n\\nإعادة المحاولة");
             errorView.setVisibility(View.VISIBLE);
             errorView.setOnClickListener(v -> loadDashboard());
         }
@@ -122,6 +119,7 @@ public class MainActivity extends Activity {
     private void replaceCrashedWebView() {
         if (webView != null) {
             root.removeView(webView);
+            webView.destroy();
             webView = null;
         }
         createWebView();
