@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - stage-dashboard-android-apk
+      - stage-dashboard-android-apk-v2-clean
 
 jobs:
   build-apk:
@@ -31,6 +32,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: alex-bitcoin-dashboard-apk
+          name: alex-bitcoin-dashboard-apk-v2-clean
           path: android-dashboard/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
