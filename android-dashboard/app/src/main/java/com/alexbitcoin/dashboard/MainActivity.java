@@ -1,7 +1,9 @@
 package com.alexbitcoin.dashboard;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -20,7 +22,7 @@ public class MainActivity extends Activity {
 
     private FrameLayout root;
     private WebView webView;
-    private TextView errorView;
+    private TextView statusView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,58 +36,81 @@ public class MainActivity extends Activity {
         root = new FrameLayout(this);
         root.setBackgroundColor(Color.rgb(5, 7, 10));
 
-        errorView = new TextView(this);
-        errorView.setText("Alex Bitcoin\\n\\nجارِ فتح لوحة التحكم...");
-        errorView.setTextColor(Color.WHITE);
-        errorView.setTextSize(18);
-        errorView.setGravity(Gravity.CENTER);
-        errorView.setPadding(48, 48, 48, 48);
-        errorView.setVisibility(View.VISIBLE);
-
-        root.addView(errorView, new FrameLayout.LayoutParams(
+        statusView = new TextView(this);
+        statusView.setText("Alex Bitcoin\n\nجارِ فتح لوحة التحكم...");
+        statusView.setTextColor(Color.WHITE);
+        statusView.setTextSize(18);
+        statusView.setGravity(Gravity.CENTER);
+        statusView.setPadding(48, 48, 48, 48);
+        statusView.setVisibility(View.VISIBLE);
+        root.addView(statusView, new FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
         ));
+
         setContentView(root);
     }
 
     private void createWebView() {
         webView = new WebView(this);
+
+        // The failure reproduced by the previous build is consistent with a
+        // WebView renderer/GPU failure. Keep the page itself remote, but force
+        // software compositing for this dedicated control shell.
+        webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
+        settings.setDatabaseEnabled(true);
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setLoadWithOverviewMode(false);
         settings.setUseWideViewPort(false);
         settings.setMediaPlaybackRequiresUserGesture(true);
+        settings.setSupportMultipleWindows(false);
+        settings.setJavaScriptCanOpenWindowsAutomatically(false);
+        settings.setSafeBrowsingEnabled(true);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            settings.setForceDark(WebSettings.FORCE_DARK_OFF);
+        }
 
+        webView.setBackgroundColor(Color.rgb(5, 7, 10));
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
-                errorView.setText("Alex Bitcoin\\n\\nجارِ فتح لوحة التحكم...");
-                errorView.setVisibility(View.VISIBLE);
+                showStatus("Alex Bitcoin\n\nجارِ فتح لوحة التحكم...");
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                errorView.setVisibility(View.GONE);
+                statusView.setVisibility(View.GONE);
             }
 
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                if (request.isForMainFrame()) showError("تعذر فتح لوحة التحكم. تحقق من الإنترنت ثم اضغط إعادة المحاولة.");
+                if (request.isForMainFrame()) {
+                    showError("تعذر فتح لوحة التحكم.");
+                }
             }
 
             @Override
             public void onReceivedHttpError(WebView view, WebResourceRequest request,
                                             android.webkit.WebResourceResponse response) {
-                if (request.isForMainFrame()) showError("الخادم أعاد خطأ HTTP. اضغط إعادة المحاولة.");
+                if (request.isForMainFrame()) {
+                    showError("الخادم أعاد خطأ HTTP.");
+                }
             }
 
             @Override
             public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
-                replaceCrashedWebView();
+                if (webView == view) {
+                    showRendererError();
+                    root.removeView(view);
+                    view.destroy();
+                    webView = null;
+                }
                 return true;
             }
         });
@@ -94,36 +119,47 @@ public class MainActivity extends Activity {
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
         ));
-        webView.bringToFront();
-        errorView.bringToFront();
     }
 
     private void loadDashboard() {
-        errorView.setText("Alex Bitcoin\\n\\nجارِ فتح لوحة التحكم...");
-        errorView.setVisibility(View.VISIBLE);
+        showStatus("Alex Bitcoin\n\nجارِ فتح لوحة التحكم...");
         try {
             webView.loadUrl(DASHBOARD_URL);
         } catch (Throwable t) {
-            showError("تعذر تشغيل WebView. اضغط إعادة المحاولة.");
+            showError("تعذر تشغيل WebView.");
         }
+    }
+
+    private void showStatus(String message) {
+        statusView.setText(message);
+        statusView.setVisibility(View.VISIBLE);
+        statusView.setOnClickListener(null);
     }
 
     private void showError(String message) {
-        if (errorView != null) {
-            errorView.setText("Alex Bitcoin\\n\\n" + message + "\\n\\nإعادة المحاولة");
-            errorView.setVisibility(View.VISIBLE);
-            errorView.setOnClickListener(v -> loadDashboard());
-        }
+        statusView.setText("Alex Bitcoin\n\n" + message + "\n\nاضغط لإعادة المحاولة");
+        statusView.setVisibility(View.VISIBLE);
+        statusView.setOnClickListener(v -> {
+            if (webView == null) {
+                createWebView();
+            }
+            loadDashboard();
+        });
     }
 
-    private void replaceCrashedWebView() {
-        if (webView != null) {
-            root.removeView(webView);
-            webView.destroy();
-            webView = null;
-        }
-        createWebView();
-        loadDashboard();
+    private void showRendererError() {
+        statusView.setText(
+            "Alex Bitcoin\n\nمحرك عرض Android تعطل أثناء فتح اللوحة.\n\n" +
+            "اضغط لفتح اللوحة بالمتصفح."
+        );
+        statusView.setVisibility(View.VISIBLE);
+        statusView.setOnClickListener(v -> {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(DASHBOARD_URL)));
+            } catch (Throwable ignored) {
+                statusView.setText("تعذر فتح المتصفح.");
+            }
+        });
     }
 
     @Override
